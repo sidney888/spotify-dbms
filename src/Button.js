@@ -1,9 +1,15 @@
-export default function MyComponent() {
-    return (
-      <div>
-        <a href="/posts">
-          <button>Posts</button>
-        </a>
-      </div>
-    );
-  }
+import { useNavigate } from "react-router-dom";
+
+const Button = ({ to }) => {
+
+	const navigate = useNavigate();
+
+	return (
+		<button className="my-button" onClick={() =>
+			{ navigate(`/${to}`) }}>
+			{to === '' ? "home" : to}
+		</button>
+	)
+}
+
+export default Button;
