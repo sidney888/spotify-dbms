@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Dropdown from "../Components/Dropdown";
+import Button from '../Components/Button';
 
 const  AnalysisPage= () => {
     const [selectedOption, setSelectedOption] = useState('Frequency');
@@ -37,7 +38,7 @@ const  AnalysisPage= () => {
             options={type}
             onOptionClick={handleOptionClick}
             /> 
-            
+        <Button to= "TrendsPage">Create Analysis</Button>
         </div>
     )
 }

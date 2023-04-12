@@ -6,6 +6,7 @@ import './styles.css';
 import Button from './Components/Button';
 import AnalysisPage from './Pages/AnalysisPage';
 import Home from './Pages/Home';
+import TrendsPage from './Pages/TrendsPage';
 
 class App extends Component {
   render() {
@@ -15,6 +16,7 @@ class App extends Component {
           <Routes>
           <Route path = "/" element = {<Home/>}/>
           <Route path = "/QueryUs" element = {<AnalysisPage />} />
+          <Route path ="/TrendsPage" element = {<TrendsPage />} />
           </Routes>
         </Router>
         </div>
