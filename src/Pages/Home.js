@@ -1,5 +1,5 @@
-import logo from './assets/spotify.png';
-import Button  from './Button';
+import logo from '../assets/spotify.png';
+import Button  from '../Components/Button';
 
 const Home = () => {
     return (

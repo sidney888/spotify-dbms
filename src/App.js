@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Link, Switch } from "react-rout
 import logo from './assets/spotify.png';
 import './App.css';
 import './styles.css';
-import Button from './Button';
-import AnalysisPage from './AnalysisPage';
-import Home from './Home';
+import Button from './Components/Button';
+import AnalysisPage from './Pages/AnalysisPage';
+import Home from './Pages/Home';
 
 class App extends Component {
   render() {
