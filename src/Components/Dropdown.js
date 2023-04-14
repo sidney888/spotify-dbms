@@ -1,33 +1,38 @@
 import React, { useState } from 'react';
+import './Dropdown.css';
 
-function Dropdown(props) {
+const Dropdown = ({ options, selectedOption, onOptionClick }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
-  function handleToggle() {
+
+  const toggleDropdown = () => {
     setIsOpen(!isOpen);
-  }
-  
-  function handleOptionClick(option) {
-    setIsOpen(false);
-    props.onOptionClick(option);
-  }
-  
+  };
+
+  const handleOptionClick = (option) => {
+    onOptionClick(option);
+    toggleDropdown();
+  };
+
   return (
-    <div className="dropdown">
-      <button className="dropdown-toggle" onClick={handleToggle}>
-        {props.selectedOption}
-      </button>
-      {isOpen &&
+    <div className="dropdown-container">
+      <div className="dropdown-selected" onClick={toggleDropdown}>
+        {selectedOption}
+      </div>
+      {isOpen && (
         <ul className="dropdown-options">
-          {props.options.map(option => (
-            <li key={option} onClick={() => handleOptionClick(option)}>
+          {options.map((option) => (
+            <li
+              key={option}
+              className={selectedOption === option ? 'selected' : ''}
+              onClick={() => handleOptionClick(option)}
+            >
               {option}
             </li>
           ))}
         </ul>
-      }
+      )}
     </div>
   );
-}
+};
 
 export default Dropdown;
