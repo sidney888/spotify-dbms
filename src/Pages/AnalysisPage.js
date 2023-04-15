@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dropdown from '../Components/Dropdown';
 import Button from '../Components/Button';
 import './AnalysisPage.css';
@@ -31,7 +31,35 @@ const AnalysisPage = () => {
     setConditions(newConditions);
   };
 
+  const [click, setClick] = useState(false);
+  const [button, setButton] = useState(true);
+
+  const handleClick = () => setClick(!click);
+  const closeMobileMenu = () => setClick(false);
+
+  const showButton = () => {
+    if (window.innerWidth <= 960) {
+      setButton(false);
+    } else {
+      setButton(true);
+    }
+  };
+
+  useEffect(() => {
+    showButton();
+  }, []);
+
+
   return (
+    <>
+    <h1>
+      Input for Trend Analysis
+    </h1>
+    <p>
+    In the Create Queries section, pick the frequency, metric, and type from the respective dropdown menus.
+    <br/>The Create Conditions section can help narrow your search. Add conditions and comparisions with specific values. 
+
+    </p>
     <div className="analysis-page">
       <div className="create-queries">
         <h2>Create Queries</h2>
@@ -54,7 +82,7 @@ const AnalysisPage = () => {
             options={type}
             onOptionClick={(queryType) => setSelectedType(queryType)}
           />
-          <Button to="TrendsPage">Create Analysis</Button>
+          {button && <Button buttonStyle='btn--primary'to='/TrendsPage'>Create Trend</Button>}
         </div>
       </div>
 
@@ -85,6 +113,7 @@ const AnalysisPage = () => {
         <Button onClick={addCondition}>Add Condition</Button>
       </div>
     </div>
+    </>
   );
 };
 
