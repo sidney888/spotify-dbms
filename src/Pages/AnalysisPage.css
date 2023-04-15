@@ -1,12 +1,25 @@
-.AnalysisPage {
-    text-align: center;
-  }
-  
+.analysis-page {
+  display: flex;
+  justify-content: space-between;
+  margin: 50px;
+}
 
-.logo {
-    width: 100px;
-    height: auto;
-    position: absolute;
-    top: 0;
-    left: 10;
-  }
+.create-queries,
+.create-conditions {
+  width: 45%;
+  background-color: #f7f7f7;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.create-queries h2,
+.create-conditions h2 {
+  margin-bottom: 20px;
+}
+
+.query-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
