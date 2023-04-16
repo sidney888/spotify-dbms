@@ -12,15 +12,17 @@ class Query {
     this.frequency = frequency; //stores the selected frequency from the dropdown
     this.metric = metric; //stores the selected metric from the dropdown.
     this.type = type; //stores selected type from dropdown
-    this.queryID = this.queryID; //This can be generated when the object is created.
+    this.queryID = ++Query.lastID; //This can be generated when the object is created.
   }
 }
 
 function AnalysisPage ({data}) {
 
   //Queries
-  const [selectedOption, setSelectedOption] = useState('Select');
-  const options = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+  const [selectedFrequency, setSelectedFrequency] = useState('Select');
+  const frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+
+  const [selectedQueryID, setSelectedQueryID] = useState(null);
 
   const [selectedMetric, setSelectedMetric] = useState('Select');
   const metrics = [
@@ -34,6 +36,7 @@ function AnalysisPage ({data}) {
   const [selectedType, setSelectedType] = useState('Select');
   const type = ['Tracks', 'Albums'];
   
+
   const [name, setName] = useState('')
 
 
@@ -69,12 +72,38 @@ function AnalysisPage ({data}) {
   //List 
   const [list, setList] = useState([]);
   const handleAddItem = () => {
-    const newQuery = new Query(selectedOption, selectedMetric, selectedType, name.name.toString());
+    const newQueryID = Query.lastID + 1; // generate new ID based on previous one
+    const newQuery = new Query(selectedFrequency, selectedMetric, selectedType, name.name.toString(), newQueryID);
+    Query.lastID = newQueryID; // update lastID to new ID
     setList([...list, newQuery]);
     setName({name: ''});
   };
+  //when a query is selected.
+  const handleSelectQuery = (Query) => {
+    setSelectedQueryID(Query.queryID);
+    setSelectedMetric(Query.metric);
+    setSelectedFrequency(Query.frequency);
+    setSelectedType(Query.type);
+    
+    setName({ name: Query.name });
+  };
 
-
+  const handleEditQuery = () => {
+    const updatedList = list.map((query) => {
+      if (query.queryID === selectedQueryID) {
+        return new Query(selectedFrequency, selectedMetric, selectedType, name.name.toString(), selectedQueryID);
+      } else {
+        return query;
+      }
+    });
+    setList(updatedList);
+    setSelectedQueryID(null);
+    setSelectedFrequency('');
+    setSelectedMetric('');
+    setSelectedType('');
+    setName({ name: '' });
+  };
+  
   return (
     <>
     <h1>
@@ -92,9 +121,9 @@ function AnalysisPage ({data}) {
             <h3>Frequency:   </h3>
           <Dropdown
             className="Frequency"
-            selectedOption={selectedOption}
-            options={options}
-            onOptionClick={(option) => setSelectedOption(option)}
+            selectedOption={selectedFrequency}
+            options={frequencies}
+            onOptionClick={(frequency) => setSelectedFrequency(frequency)}
           />
           </div>
           <div className='met'>
@@ -122,7 +151,6 @@ function AnalysisPage ({data}) {
           value={name.name || ''}
           onChange={(event) => {
             setName({ ...name, name: event.target.value });
-            console.log(name.name); // add this line to log the updated name
           }}
           />
           </div>
@@ -130,13 +158,18 @@ function AnalysisPage ({data}) {
     
         </div>
         <div className='queries'>
-          {list.map((Query, index) => (
-        <div key={index}>
-          <p>{index + 1}: {Query.name}</p>
-        </div>
-      ))}
-
-        </div>
+  {list.map((query, index) => (
+    <div key={query.queryID}>
+      <p>
+        {index + 1}: {query.name}, {query.type}, {query.frequency}
+      </p>
+      <button onClick={() => handleSelectQuery(query)}>Edit</button>
+      <button onClick={() => handleEditQuery(query)}>
+        Save Changes
+      </button>
+    </div>
+  ))}
+</div>
       </div>
 
       <div className="create-conditions">
