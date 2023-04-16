@@ -69,9 +69,9 @@ function AnalysisPage ({data}) {
   //List 
   const [list, setList] = useState([]);
   const handleAddItem = () => {
-    const newQuery = new Query(selectedOption, selectedMetric, selectedType, name);
+    const newQuery = new Query(selectedOption, selectedMetric, selectedType, name.name.toString());
     setList([...list, newQuery]);
-    setName('');
+    setName({name: ''});
   };
 
 
@@ -120,7 +120,10 @@ function AnalysisPage ({data}) {
           <input
           type="name"
           value={name.name || ''}
-          onChange={(event) => setName({ ...name, name: event.target.value })}
+          onChange={(event) => {
+            setName({ ...name, name: event.target.value });
+            console.log(name.name); // add this line to log the updated name
+          }}
           />
           </div>
           <button onClick={handleAddItem}>Add Query</button>
