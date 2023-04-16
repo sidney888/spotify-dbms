@@ -125,7 +125,7 @@ function AnalysisPage ({data}) {
         <div className='queries'>
         {list.map((Query, index) => (
         <div key={index}>
-          <p>Name: {Query.name}</p>
+          <p>{index + 1}: {Query.name}</p>
         </div>
       ))}
 
