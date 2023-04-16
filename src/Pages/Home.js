@@ -35,7 +35,7 @@ const Home = () => {
             </p>
         
             <p className = "getstarted">Click here to get started!</p>
-            <Button to="QueryUs">Query Us!</Button>
+            {button && <Button to="QueryUs">Query Us!</Button>}
             </div>
         </div>
     )

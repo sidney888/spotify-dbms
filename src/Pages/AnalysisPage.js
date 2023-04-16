@@ -4,10 +4,10 @@ import Button from '../Components/Button';
 import './AnalysisPage.css';
 
 const AnalysisPage = () => {
-  const [selectedOption, setSelectedOption] = useState('Frequency');
+  const [selectedOption, setSelectedOption] = useState('Select');
   const options = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
 
-  const [selectedMetric, setSelectedMetric] = useState('Metric');
+  const [selectedMetric, setSelectedMetric] = useState('Select');
   const metrics = [
     'Average Danceability',
     'Average Energy',
@@ -16,7 +16,7 @@ const AnalysisPage = () => {
     'Volume',
   ];
 
-  const [selectedType, setSelectedType] = useState('Query Type');
+  const [selectedType, setSelectedType] = useState('Select');
   const type = ['Tracks', 'Albums'];
 
   const [conditions, setConditions] = useState([{ metric: '', operator: '', value: '' }]);
@@ -64,24 +64,33 @@ const AnalysisPage = () => {
       <div className="create-queries">
         <h2>Create Queries</h2>
         <div className="query-options">
+          <div className='freq'>
+            <h3>Frequency:   </h3>
           <Dropdown
             className="Frequency"
             selectedOption={selectedOption}
             options={options}
             onOptionClick={(option) => setSelectedOption(option)}
           />
+          </div>
+          <div className='met'>
+            <h3>Metric:   </h3>          
           <Dropdown
             className="Metric"
             selectedOption={selectedMetric}
             options={metrics}
             onOptionClick={(metric) => setSelectedMetric(metric)}
           />
+          </div>
+          <div className='typ'>
+            <h3>Type:   </h3>
           <Dropdown
             className="Type"
             selectedOption={selectedType}
             options={type}
             onOptionClick={(queryType) => setSelectedType(queryType)}
           />
+          </div>
           {button && <Button buttonStyle='btn--primary'to='/TrendsPage'>Create Trend</Button>}
         </div>
       </div>
@@ -90,24 +99,33 @@ const AnalysisPage = () => {
         <h2>Create Conditions</h2>
         {conditions.map((condition, index) => (
           <div key={index} className="condition">
+            <div className='met'>
+              <h3>Metric:   </h3>
             <Dropdown
               className="Metric"
               selectedOption={condition.metric}
               options={metrics}
               onOptionClick={(metric) => updateCondition(index, 'metric', metric)}
             />
+            </div>
+            <div className= 'operator'> 
+            <h3>Comparison:   </h3>
             <Dropdown
               className="Operator"
               selectedOption={condition.operator}
               options={['>', '<', '=', '≠']}
               onOptionClick={(operator) => updateCondition(index, 'operator', operator)}
             />
+            </div>
+            <div className='input'>
+              <h3>Value: </h3>
             <input
               type="text"
               placeholder="Value"
               value={condition.value}
-              onChange={(e) => updateCondition(index, 'value', e.target.value)}
+              onChange={(e) => updateCondition(index, '', e.target.value)}
             />
+            </div>
           </div>
         ))}
         <Button onClick={addCondition}>Add Condition</Button>

@@ -29,7 +29,7 @@ const TrendsPage = () => {
             <h1>Trend Analysis</h1>
 
         <p className = "getstarted">Click here to get started!</p>
-        {button && <Button buttonStyle='btn--primary'to='/TrendsPage'>New Trend</Button>}
+        {button && <Button buttonStyle='btn--primary'to='/QueryUs'>New Trend</Button>}
         </div>
     )
 }
