@@ -4,11 +4,15 @@ import Button from '../Components/Button';
 import './AnalysisPage.css';
 
 class Query {
+  static lastID = 0; //keeps track of queryIDs.
+
+
   constructor(frequency, metric, type, name) {
-    this.name = name;
-    this.frequency = frequency;
-    this.metric = metric;
-    this.type = type;
+    this.name = name; //stores the name of the query as a string
+    this.frequency = frequency; //stores the selected frequency from the dropdown
+    this.metric = metric; //stores the selected metric from the dropdown.
+    this.type = type; //stores selected type from dropdown
+    this.queryID = this.queryID; //This can be generated when the object is created.
   }
 }
 
@@ -123,7 +127,7 @@ function AnalysisPage ({data}) {
     
         </div>
         <div className='queries'>
-        {list.map((Query, index) => (
+          {list.map((Query, index) => (
         <div key={index}>
           <p>{index + 1}: {Query.name}</p>
         </div>
