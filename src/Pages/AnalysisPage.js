@@ -66,15 +66,20 @@ function AnalysisPage ({data}) {
     }
   };
 
+  const [errorMessage, setErrorMessage]= useState('');
 
   //List of queries 
   const [list, setList] = useState([]);
   const handleAddItem = () => {
-    const newQueryID = Query.lastID + 1; // generate new ID based on previous one
-    const newQuery = new Query(selectedFrequency, selectedMetric, selectedType, name.name.toString(), newQueryID);
-    Query.lastID = newQueryID; // update lastID to new ID
-    setList([...list, newQuery]);
-    setName({name: ''});
+    if (name ==''){    
+      setErrorMessage('Please name your query');
+    }else{
+      const newQueryID = Query.lastID + 1; // generate new ID based on previous one  
+      const newQuery = new Query(selectedFrequency, selectedMetric, selectedType, name.name.toString(), newQueryID);
+      Query.lastID = newQueryID; // update lastID to new ID
+      setList([...list, newQuery]);
+      setName({name: ''});
+    }
   };
   //when a query is selected.
   const handleSelectQuery = (Query) => {
@@ -184,6 +189,7 @@ function AnalysisPage ({data}) {
           />
           </div>
           <button onClick={handleAddItem}>Add Query</button>
+          {errorMessage && <p style={{color:'red'}}>{errorMessage}</p>}
     
         </div>
         <div className='queries'>
@@ -196,6 +202,7 @@ function AnalysisPage ({data}) {
       <button onClick={() => handleEditQuery(query)}>
         Save Changes
       </button>
+    
     </div>
   ))}
 </div>
@@ -240,6 +247,7 @@ function AnalysisPage ({data}) {
           Add Condition</Button>
       </div>
     </div>
+    {button && <Button to ='/TrendsPage' >Find Trends!</Button>}
     </>
   );
 };
