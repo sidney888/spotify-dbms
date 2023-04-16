@@ -39,3 +39,6 @@
   justify-content: left;
 }
 
+.selected {
+  background-color: yellow;
+}

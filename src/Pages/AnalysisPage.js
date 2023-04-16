@@ -6,24 +6,26 @@ import './AnalysisPage.css';
 class Query {
   static lastID = 0; //keeps track of queryIDs.
 
-
-  constructor(frequency, metric, type, name) {
+  constructor(frequency, metric, type, name, queryID) {
     this.name = name; //stores the name of the query as a string
     this.frequency = frequency; //stores the selected frequency from the dropdown
     this.metric = metric; //stores the selected metric from the dropdown.
     this.type = type; //stores selected type from dropdown
-    this.queryID = ++Query.lastID; //This can be generated when the object is created.
+    this.queryID = queryID || ++Query.lastID; //This can be generated when the object is created.
   }
+
+
 }
 
 class Condition {
-  constructor(cname, cmetric, operator, agg_function, agg_metric, cvalue) {
+  constructor(cname, cmetric, operator, agg_function, agg_metric, cvalue, qID) {
     this.cname = cname;
     this.cmetric = cmetric;
     this.operator = operator;
     this.agg_function = agg_function;
     this.agg_metric = agg_metric;
     this.cvalue = cvalue;
+    this.qID = qID;
   }
 }
 
@@ -36,6 +38,7 @@ function AnalysisPage ({data}) {
   const frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
   //set queryID
   const [selectedQueryID, setSelectedQueryID] = useState(null);
+  const [selectedQuery, setSelectedQuery] = useState(null); // keeps track of the selected query. 
   //set query metric
   const [selectedMetric, setSelectedMetric] = useState('Select');
   const metrics = [
@@ -66,15 +69,20 @@ function AnalysisPage ({data}) {
     }
   };
 
-
+  const [errorMessage, setErrorMessage]= useState('');
   //List of queries 
   const [list, setList] = useState([]);
   const handleAddItem = () => {
-    const newQueryID = Query.lastID + 1; // generate new ID based on previous one
-    const newQuery = new Query(selectedFrequency, selectedMetric, selectedType, name.name.toString(), newQueryID);
-    Query.lastID = newQueryID; // update lastID to new ID
-    setList([...list, newQuery]);
-    setName({name: ''});
+    if(name.name == ''){
+      setErrorMessage('Please name your query');
+    } else {
+        const newQueryID = Query.lastID + 1; // generate new ID based on previous one
+        const newQuery = new Query(selectedFrequency, selectedMetric, selectedType, name.name.toString(), newQueryID);
+        Query.lastID = newQueryID; // update lastID to new ID
+        setList([...list, newQuery]);
+        setName({name: ''});
+    }
+
   };
   //when a query is selected.
   const handleSelectQuery = (Query) => {
@@ -82,9 +90,14 @@ function AnalysisPage ({data}) {
     setSelectedMetric(Query.metric);
     setSelectedFrequency(Query.frequency);
     setSelectedType(Query.type);
-    
+    setSelectedQuery(Query);
+
     setName({ name: Query.name });
   };
+  useEffect(() => {
+    console.log('Currently selected query:', selectedQuery);
+  }, [selectedQuery]);
+  
   //when a query is edited
   const handleEditQuery = () => {
     const updatedList = list.map((query) => {
@@ -100,11 +113,15 @@ function AnalysisPage ({data}) {
     setSelectedMetric('');
     setSelectedType('');
     setName({ name: '' });
+
   };
 
 
-    const [conditions, setConditions] = useState([]);
+    
     //Conditions
+    const [conditions, setConditions] = useState([]);
+    const[cname, setcname] = useState('');
+
     const [selectedcmetric, setSelectedcmetric] = useState('Select');
     const cmetrics = [
     'Average Danceability',
@@ -119,10 +136,12 @@ function AnalysisPage ({data}) {
 
     const[cvalue, setcvalue] = useState('');
 
-    
+    const[qID, setqID] = useState()
 
-    const handleAddCondition = (newCondition) => {
-      setConditions([...conditions, newCondition]);
+    const handleAddCondition = () => {
+      // const newCondition = new Condition(cname.cname.toString(), cmetric, operator, agg_function, agg_metric, cvalue);
+      // setConditions([...conditions, newCondition]);
+      // setcname({cname: ''});
     };
   
     const updateCondition = (index, field, value) => {
@@ -190,12 +209,18 @@ function AnalysisPage ({data}) {
   {list.map((query, index) => (
     <div key={query.queryID}>
       <p>
-        {index + 1}: {query.name}, {query.type}, {query.frequency}
+        {index + 1}: {query.name}
       </p>
       <button onClick={() => handleSelectQuery(query)}>Edit</button>
       <button onClick={() => handleEditQuery(query)}>
         Save Changes
       </button>
+      <button 
+      className={`query ${selectedQuery === query ? 'selected' : ''}`}
+      onClick={() => {
+        setSelectedQuery(query);
+      }}>Select Query</button>
+
     </div>
   ))}
 </div>
