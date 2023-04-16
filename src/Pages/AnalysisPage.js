@@ -3,7 +3,18 @@ import Dropdown from '../Components/Dropdown';
 import Button from '../Components/Button';
 import './AnalysisPage.css';
 
-const AnalysisPage = () => {
+class Query {
+  constructor(frequency, metric, type, name) {
+    this.name = name;
+    this.frequency = frequency;
+    this.metric = metric;
+    this.type = type;
+  }
+}
+
+function AnalysisPage ({data}) {
+
+  //Queries
   const [selectedOption, setSelectedOption] = useState('Select');
   const options = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
 
@@ -18,11 +29,15 @@ const AnalysisPage = () => {
 
   const [selectedType, setSelectedType] = useState('Select');
   const type = ['Tracks', 'Albums'];
+  
+  const [name, setName] = useState('')
 
-  const [conditions, setConditions] = useState([{ metric: '', operator: '', value: '' }]);
+
+  //Conditions
+  const [conditions, setConditions] = useState([{ metrix: '', operator: '', value: '' }]);
 
   const addCondition = () => {
-    setConditions([...conditions, { metric: '', operator: '', value: '' }]);
+    setConditions([...conditions, { metrix: '', operator: '', value: '' }]);
   };
 
   const updateCondition = (index, field, value) => {
@@ -31,6 +46,7 @@ const AnalysisPage = () => {
     setConditions(newConditions);
   };
 
+  //Button (NAVIGATION)
   const [click, setClick] = useState(false);
   const [button, setButton] = useState(true);
 
@@ -45,9 +61,14 @@ const AnalysisPage = () => {
     }
   };
 
-  useEffect(() => {
-    showButton();
-  }, []);
+
+  //List 
+  const [list, setList] = useState([]);
+  const handleAddItem = () => {
+    const newQuery = new Query(selectedOption, selectedMetric, selectedType, name);
+    setList([...list, newQuery]);
+    setName('');
+  };
 
 
   return (
@@ -57,8 +78,7 @@ const AnalysisPage = () => {
     </h1>
     <p>
     In the Create Queries section, pick the frequency, metric, and type from the respective dropdown menus.
-    <br/>The Create Conditions section can help narrow your search. Add conditions and comparisions with specific values. 
-
+    <br/>The Create Conditions section can help narrow your search. Add conditions and comparisions with specific values.
     </p>
     <div className="analysis-page">
       <div className="create-queries">
@@ -91,7 +111,24 @@ const AnalysisPage = () => {
             onOptionClick={(queryType) => setSelectedType(queryType)}
           />
           </div>
-          {button && <Button buttonStyle='btn--primary'to='/TrendsPage'>Create Trend</Button>}
+          <div className='names'>
+            <h3>Query Name: </h3>
+          <input
+          type="name"
+          value={name.name || ''}
+          onChange={(event) => setName({ ...name, name: event.target.value })}
+          />
+          </div>
+          <button onClick={handleAddItem}>Add Query</button>
+    
+        </div>
+        <div className='queries'>
+        {list.map((Query, index) => (
+        <div key={index}>
+          <p>Name: {Query.name}</p>
+        </div>
+      ))}
+
         </div>
       </div>
 
@@ -103,7 +140,7 @@ const AnalysisPage = () => {
               <h3>Metric:   </h3>
             <Dropdown
               className="Metric"
-              selectedOption={condition.metric}
+              selectedOption={condition.metrix}
               options={metrics}
               onOptionClick={(metric) => updateCondition(index, 'metric', metric)}
             />
@@ -120,7 +157,7 @@ const AnalysisPage = () => {
             <div className='input'>
               <h3>Value: </h3>
             <input
-              type="text"
+              type="num"
               placeholder="Value"
               value={condition.value}
               onChange={(e) => updateCondition(index, '', e.target.value)}

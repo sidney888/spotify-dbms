@@ -17,7 +17,7 @@
 .create-conditions h2 {
   margin-bottom: 20px;
 }
-.typ, .met, .freq, .operator, .input{
+.typ, .met, .freq, .operator, .input, .names{
   display: flex;
   flex-direction: row;
   justify-content: left;
