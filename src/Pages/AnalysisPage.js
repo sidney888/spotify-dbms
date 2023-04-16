@@ -16,14 +16,27 @@ class Query {
   }
 }
 
+class Condition {
+  constructor(cname, cmetric, operator, agg_function, agg_metric, cvalue) {
+    this.cname = cname;
+    this.cmetric = cmetric;
+    this.operator = operator;
+    this.agg_function = agg_function;
+    this.agg_metric = agg_metric;
+    this.cvalue = cvalue;
+  }
+}
+
 function AnalysisPage ({data}) {
 
   //Queries
+
+  //set queryFrequency
   const [selectedFrequency, setSelectedFrequency] = useState('Select');
   const frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-
+  //set queryID
   const [selectedQueryID, setSelectedQueryID] = useState(null);
-
+  //set query metric
   const [selectedMetric, setSelectedMetric] = useState('Select');
   const metrics = [
     'Average Danceability',
@@ -32,26 +45,11 @@ function AnalysisPage ({data}) {
     'Average Valence',
     'Volume',
   ];
-
+  //set query type
   const [selectedType, setSelectedType] = useState('Select');
   const type = ['Tracks', 'Albums'];
-  
-
-  const [name, setName] = useState('')
-
-
-  //Conditions
-  const [conditions, setConditions] = useState([{ metrix: '', operator: '', value: '' }]);
-
-  const addCondition = () => {
-    setConditions([...conditions, { metrix: '', operator: '', value: '' }]);
-  };
-
-  const updateCondition = (index, field, value) => {
-    const newConditions = [...conditions];
-    newConditions[index][field] = value;
-    setConditions(newConditions);
-  };
+  //set query name
+  const [name, setName] = useState('') 
 
   //Button (NAVIGATION)
   const [click, setClick] = useState(false);
@@ -69,7 +67,7 @@ function AnalysisPage ({data}) {
   };
 
 
-  //List 
+  //List of queries 
   const [list, setList] = useState([]);
   const handleAddItem = () => {
     const newQueryID = Query.lastID + 1; // generate new ID based on previous one
@@ -87,7 +85,7 @@ function AnalysisPage ({data}) {
     
     setName({ name: Query.name });
   };
-
+  //when a query is edited
   const handleEditQuery = () => {
     const updatedList = list.map((query) => {
       if (query.queryID === selectedQueryID) {
@@ -103,7 +101,34 @@ function AnalysisPage ({data}) {
     setSelectedType('');
     setName({ name: '' });
   };
+    //Conditions
+    const [selectedcmetric, setSelectedcmetric] = useState('Select');
+    const cmetrics = [
+    'Average Danceability',
+    'Average Energy',
+    'Average Liveness',
+    'Average Valence',
+    'Volume',
+  ];
+
+    const[selectedoperator, setSelectedOperator] = useState('Select');
+    const operators = ['>', '<', '>=', '<=', '=', '!='];
+
+    const[cvalue, setcvalue] = useState('');
+
+    const [conditions, setConditions] = useState([{ metrix: '', operator: '', value: '' }]);
+
+    const addCondition = () => {
+      setConditions([...conditions, { metrix: '', operator: '', value: '' }]);
+    };
   
+    const updateCondition = (index, field, value) => {
+      const newConditions = [...conditions];
+      newConditions[index][field] = value;
+      setConditions(newConditions);
+    };
+
+
   return (
     <>
     <h1>
@@ -117,6 +142,7 @@ function AnalysisPage ({data}) {
       <div className="create-queries">
         <h2>Create Queries</h2>
         <div className="query-options">
+          
           <div className='freq'>
             <h3>Frequency:   </h3>
           <Dropdown
@@ -176,22 +202,22 @@ function AnalysisPage ({data}) {
         <h2>Create Conditions</h2>
         {conditions.map((condition, index) => (
           <div key={index} className="condition">
-            <div className='met'>
+            <div className='cmet'>
               <h3>Metric:   </h3>
             <Dropdown
               className="Metric"
-              selectedOption={condition.metrix}
-              options={metrics}
-              onOptionClick={(metric) => updateCondition(index, 'metric', metric)}
+              selectedOption={selectedcmetric}
+              options={cmetrics}
+              onOptionClick={(cmetric) => setSelectedcmetric(cmetric)}
             />
             </div>
             <div className= 'operator'> 
             <h3>Comparison:   </h3>
             <Dropdown
               className="Operator"
-              selectedOption={condition.operator}
-              options={['>', '<', '=', '≠']}
-              onOptionClick={(operator) => updateCondition(index, 'operator', operator)}
+              selectedOption={selectedoperator}
+              options={operators}
+              onOptionClick={(operator) => setSelectedOperator(operator)}
             />
             </div>
             <div className='input'>
@@ -199,13 +225,16 @@ function AnalysisPage ({data}) {
             <input
               type="num"
               placeholder="Value"
-              value={condition.value}
-              onChange={(e) => updateCondition(index, '', e.target.value)}
+              value={cvalue.cvalue || ''}
+              onChange={(event) => {
+                setcvalue({ ...cvalue, cvalue: event.target.value });
+              }}
             />
             </div>
           </div>
         ))}
-        <Button onClick={addCondition}>Add Condition</Button>
+        <Button onClick={addCondition}>
+          Add Condition</Button>
       </div>
     </div>
     </>
