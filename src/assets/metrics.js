@@ -15,16 +15,20 @@ const query_metrics = [
 	"Volume"
 ];
 
-const condition_metrics = query_metrics.concat([
+const aggregate_metrics = query_metrics.concat([
+	"Release Date",
+]);
+
+const condition_metrics = aggregate_metrics.concat([
 	"Track Name",
 	"Album Name",
 	"Artist Name",
 	"Key Signature",
 	"Time Signature",
 	"Album Type",
-	"Release Date",
 	"Artist Genre"
 ]);
 
 exports.query_metrics = query_metrics;
+exports.aggregate_metrics = aggregate_metrics;
 exports.condition_metrics = condition_metrics;
