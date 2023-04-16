@@ -101,6 +101,9 @@ function AnalysisPage ({data}) {
     setSelectedType('');
     setName({ name: '' });
   };
+
+
+    const [conditions, setConditions] = useState([]);
     //Conditions
     const [selectedcmetric, setSelectedcmetric] = useState('Select');
     const cmetrics = [
@@ -116,10 +119,10 @@ function AnalysisPage ({data}) {
 
     const[cvalue, setcvalue] = useState('');
 
-    const [conditions, setConditions] = useState([{ metrix: '', operator: '', value: '' }]);
+    
 
-    const addCondition = () => {
-      setConditions([...conditions, { metrix: '', operator: '', value: '' }]);
+    const handleAddCondition = (newCondition) => {
+      setConditions([...conditions, newCondition]);
     };
   
     const updateCondition = (index, field, value) => {
@@ -233,7 +236,7 @@ function AnalysisPage ({data}) {
             </div>
           </div>
         ))}
-        <Button onClick={addCondition}>
+        <Button onClick={handleAddCondition}>
           Add Condition</Button>
       </div>
     </div>
