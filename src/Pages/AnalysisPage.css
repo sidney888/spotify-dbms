@@ -3,7 +3,13 @@
   justify-content: space-between;
   margin: 50px;
 }
-
+.title{
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  align-self: center;
+  justify-self: center;
+}
 
 .create-queries,
 .create-conditions {
@@ -16,6 +22,8 @@
 .create-queries h2,
 .create-conditions h2 {
   margin-bottom: 20px;
+  justify-content: center;
+  align-items: center;
 }
 .typ, .met, .freq, .operator, .input, .names{
   display: flex;
