@@ -37,11 +37,23 @@ function AnalysisPage ({data}) {
   const [name, setName] = useState('')
 
 
+  const [queries, setQueries]= useState([{ frequency: '', metric: '',type:'', name:''}])  
+  const addQuery = () =>{
+    setName ([queries,{ frequency: '', metric: '',type:'', name:''}]);
+  }
+
+  const updateQueries = (index, field, value) => {
+    const newQueries = [...queries];
+    newQueries[index][field] = value;
+    setQueries(newQueries);
+  };
+
+
   //Conditions
-  const [conditions, setConditions] = useState([{ metrix: '', operator: '', value: '' }]);
+  const [conditions, setConditions] = useState([{ metric: '', operator: '', value: '' }]);
 
   const addCondition = () => {
-    setConditions([...conditions, { metrix: '', operator: '', value: '' }]);
+    setConditions([...conditions, { metric: '', operator: '', value: '' }]);
   };
 
   const updateCondition = (index, field, value) => {
@@ -68,8 +80,9 @@ function AnalysisPage ({data}) {
 
   //List 
   const [list, setList] = useState([]);
-  const handleAddItem = () => {
-    const newQuery = new Query(selectedOption, selectedMetric, selectedType, name);
+
+  const handleAddItem = (selectedOption, selectedMetric, selectedType,name) => {
+    const newQuery = new Query(selectedOption,selectedMetric, selectedType, name);
     setList([...list, newQuery]);
     setName('');
   };
@@ -77,7 +90,7 @@ function AnalysisPage ({data}) {
 
   return (
     <>
-    <h1>
+    <h1 className='title'>
       Input for Trend Analysis
     </h1>
     <p>
@@ -123,7 +136,12 @@ function AnalysisPage ({data}) {
           onChange={(event) => setName({ ...name, name: event.target.value })}
           />
           </div>
-          <button onClick={handleAddItem}>Add Query</button>
+          if (selectedOption != 'Select' && selectedMetric != 'Select' && selectedType != 'Select') {
+          <Button onClick={handleAddItem(selectedOption,selectedMetric,selectedType,name)}>Add Query</Button>
+          }else{
+            <Button>Add Query</Button>
+          } 
+          
     
         </div>
         <div className='queries'>
@@ -144,7 +162,7 @@ function AnalysisPage ({data}) {
               <h3>Metric:   </h3>
             <Dropdown
               className="Metric"
-              selectedOption={condition.metrix}
+              selectedOption={condition.metric}
               options={metrics}
               onOptionClick={(metric) => updateCondition(index, 'metric', metric)}
             />
@@ -161,8 +179,7 @@ function AnalysisPage ({data}) {
             <div className='input'>
               <h3>Value: </h3>
             <input
-              type="num"
-              placeholder="Value"
+              type="text"
               value={condition.value}
               onChange={(e) => updateCondition(index, '', e.target.value)}
             />
