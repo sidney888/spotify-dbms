@@ -44,3 +44,6 @@
   align-content: center;
 }
 
+.selected {
+  background-color: yellow;
+}
