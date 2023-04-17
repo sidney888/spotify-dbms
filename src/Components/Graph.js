@@ -1,34 +1,60 @@
-import Chart from 'chart.js';
-import React, {useRef, useEffect, useState} from 'react';
+import React from 'react';
+import { Line } from 'react-chartjs-2';
 
-function Graph(props) {
-  const [data, setData] = useState([]);
+const Graph = ({ xData, yData }) => {
+  const state = {
+    labels: xData,
+    datasets: [
+      {
 
-  const dataString ='';
-  const dataArray =[];
+        fill: false,
+        lineTension: 0.5,
+        backgroundColor: 'rgba(75,192,192,1)',
+        borderColor: 'rgba(0,0,0,1)',
+        borderWidth: 2,
+        data: yData,
+      },
+    ],
+  };
 
-  useEffect(() => {
-    fetch()
-    .then(response =>response.json)()
-    .then (data=> {
-        dataArray =JSON.parse(dataString);
-        setData(dataArray);
-    })
-    .catch(error =>{
-        console.error('Error fetching data', error);
-    });
-  }, []);
+  const options = {
+    title: {
+      display: true,
+      text: 'Graph Title',
+      fontSize: 20,
+    },
+    legend: {
+      display: true,
+      position: 'right',
+    },
+    scales: {
+      xAxes: [
+        {
+          type: 'linear',
+          position: 'bottom',
+          ticks: {
+            beginAtZero: true,
+          },
+        },
+      ],
+    },
+  };
 
-  return(
+  return (
     <div>
-        <h1> GRAPHHHH</h1>
-        <Graph data ={data}></Graph>
+      <Line data={state} options={{
+          title: {
+            display: true,
+            text: 'TITLE',
+            fontSize: 20
+          },
+          legend: {
+            display: true,
+            position: 'right'
+          }
+        }} />
     </div>
-  )
-  
-  
-  
-  
-  
-}
+  );
+};
+
 export default Graph;

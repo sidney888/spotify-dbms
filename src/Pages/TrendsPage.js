@@ -3,13 +3,14 @@ import AnalysisPage from './AnalysisPage';
 import React, { useState, useEffect } from 'react';
 import './TrendsPage.css';
 import Graph from '../Components/Graph';
-import axios from "axios";
 import { Table } from "react-table";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
+
+ 
 const TrendsPage = () => {
-
-
+  const [data, setData] = useState([]);
+  const xData = [1965, 1980, 1960, 1966, 1970, 1975, 1969, 1961, 1968, 1973, 1977, 1967, 1974, 1976, 1962, 1971, 1963, 1964, 1979, 1978, 1972];
+  const yData = [3038, 9653, 1141, 3313, 5883, 6352, 5729, 703, 4970, 5937, 7187, 3921, 5381, 6949, 1197, 5216, 1402, 1784, 8634, 8173, 5562];
 
 
     //BUTTON FUNCTIONALITY
@@ -42,7 +43,7 @@ const TrendsPage = () => {
           <h2>
             Graph
           </h2>
-          <Graph></Graph>
+          <Graph xData ={xData} yData={yData}/>
          
 
         </div>
