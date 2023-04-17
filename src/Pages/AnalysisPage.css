@@ -47,6 +47,11 @@
   justify-content: left;
 }
 
+.find{
+  justify-content: center;
+  align-content: center;
+}
+
 .selected {
   background-color: yellow;
 }
