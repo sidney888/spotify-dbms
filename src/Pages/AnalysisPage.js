@@ -88,7 +88,7 @@ function AnalysisPage({ data }) {
   //List of queries 
   const [list, setList] = useState([]);
   const handleAddItem = () => {
-    if (name.name == '') {
+    if (name == '') {
       setErrorMessage('Please name your query');
     } else {
       const newQueryID = Query.lastID + 1; // generate new ID based on previous one
@@ -130,7 +130,6 @@ function AnalysisPage({ data }) {
   };
 
 
-
   //Conditions
   const [conditions, setConditions] = useState([]);
   const [cname, setcname] = useState('');
@@ -151,15 +150,24 @@ function AnalysisPage({ data }) {
   const [selected_agg_metric, setSelected_agg_metric] = useState('Select');
   const [agg_metrics, setaggmetrics] = useState([]); //still need to update and make dropdown for.
 
+  const [errorCondition, setErrorCondition] = useState('');
+
+
   const handleAddCondition = () => {
-    const newCondition = new Condition(cname.cname.toString(), selectedcmetric, selectedoperator, selected_agg_function, selected_agg_metric, cvalue, qID && qID.qID ? qID.qID.toString() : null);
-    setConditions([...conditions, newCondition]); //adds a new condition to the list of conditions.
-    if(!Array.isArray(selectedQuery.conditions)){
-      selectedQuery.conditions = [];
+    if(cname == ''){
+      setErrorCondition('Please name your condition');
+    }else{
+      const newCondition = new Condition(cname.cname.toString(), selectedcmetric, selectedoperator, selected_agg_function, selected_agg_metric, cvalue, qID && qID.qID ? qID.qID.toString() : null);
+      setConditions([...conditions, newCondition]); //adds a new condition to the list of conditions.
+      if(!Array.isArray(selectedQuery.conditions)){
+        selectedQuery.conditions = [];
+      }
+      selectedQuery.conditions.push(newCondition); //adds condition to the selected query list.
+      setcname({cname: '' });
+      //add this condition to the selected query condition list.
+
     }
-    selectedQuery.conditions.push(newCondition); //adds condition to the selected query list.
-    setcname({cname: '' });
-    //add this condition to the selected query condition list.
+  
   };
 
 
@@ -242,7 +250,8 @@ function AnalysisPage({ data }) {
                 onOptionClick={(metric) => setSelectedMetric(metric)}
               />
             </div>
-            <button onClick={handleAddItem}>Add Query</button>
+            {button &&<Button onClick={handleAddItem}>Add Query</Button>} 
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
 
           </div>
           <div className='queries'>
@@ -266,9 +275,8 @@ function AnalysisPage({ data }) {
           </div>
           <div>
       {/* Other content */}
-      <Link className="trends-button" onClick={createTrend}>
-        <button>Create Trend!</button>
-      </Link>
+    
+     
     </div>
         </div>
         <div className="create-conditions">
@@ -343,10 +351,12 @@ function AnalysisPage({ data }) {
             />
           </div>
           <Button onClick={handleAddCondition}>Add Condition</Button>
+          {errorCondition && <p style={{ color: 'red' }}>{errorCondition}</p>}
 
         </div>
 
       </div>
+      {button &&<Button onClick={createTrend} to= '/TrendsPage'>Create Trend!</Button>}
       <div className="created-conditions">
         <h2>Created Conditions</h2>
         <ol>
@@ -355,6 +365,7 @@ function AnalysisPage({ data }) {
           ))}
         </ol>
       </div>
+
     </>
   );
 };

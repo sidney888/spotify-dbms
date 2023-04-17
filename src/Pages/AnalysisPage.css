@@ -33,7 +33,9 @@
   justify-content: center;
   align-items: center;
 }
-.typ, .met, .freq, .operator, .input, .names{
+.typ, .met, .freq, .operator, .input, .names, 
+.input_name, .input_metric, .input_operator, .input_value,
+.input_qid, .input_aggf, .input_aggm{
   display: flex;
   flex-direction: row;
   justify-content: left;
