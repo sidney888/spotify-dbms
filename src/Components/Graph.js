@@ -47,9 +47,9 @@ const Graph = ({data}) => {
     //labels: dataArray.map((item) => item[xIndex].toString()), // use year or month/year as label depending on the format
     datasets: [
       {
-        label: 'My Dataset',
+        label: 'My Trend Query',
         data: dataArray.map((item) => item[yIndex]), // use value as data for all formats
-        borderColor: 'blue',
+        borderColor: 'green',
         fill: false,
       },
     ],
