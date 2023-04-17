@@ -157,7 +157,8 @@ app.get("/api/count", (req, res) => {
 });
 
 app.get("/api/analyze", (req, res) => {
-	let { queries, analyze } = JSON.parse(req.query.q);
+	const json = JSON.parse(req.query.q);
+	let { queries, analyze } = json;
 	analyze = analyze.toString();
 	const dependencies = {};
 	const clauses = {};
@@ -351,7 +352,7 @@ app.get("/api/analyze", (req, res) => {
 		query_table.add("Artist");
 		query_table.add(artist_relation);
 	}
-	execute(
+	const sql_query =
 		`SELECT ${monthly ? "Month," : ""} Year, ${count ? "COUNT(*)" : `AVG(QueryMetric)`}
 		FROM
 		(
@@ -364,7 +365,9 @@ app.get("/api/analyze", (req, res) => {
 		${clause.suffix}
 		${suffix}
 		)
-		GROUP BY Year${monthly ? ", Month" : ""}`.replaceAll("\t", "").replaceAll(/\n\s*\n/g,"\n").replaceAll(/ \s* /g, " ")
+		GROUP BY Year${monthly ? ", Month" : ""}`.replaceAll("\t", "").replaceAll(/\n\s*\n/g,"\n").replaceAll(/ \s* /g, " ");
+	console.log(`JSON:\n${JSON.stringify(json, null, 4)}\n\nQuery:\n${sql_query}`);
+	execute(sql_query
 	).then(result => {
 		res.json(result.rows);
 	}).catch(err => {
