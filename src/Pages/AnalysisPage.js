@@ -269,12 +269,15 @@ function AnalysisPage({ data }) {
                 <p>
                   {index + 1}: {query.name}
                 </p>
-                {button &&<Button buttonStyle={'btn--outline'} onClick={handleSelectQuery} buttonSize={'btn--small'}>Edit</Button>}
-                {button &&<Button buttonStyle={'btn--outline'} onClick={handleEditQuery} buttonSize={'btn--small'}>Save Changes</Button>}
-                {button &&<Button  buttonStyle={'btn--outline'} className={`query ${selectedQuery === query ? 'selected' : ''}`}
+                <button onClick={() => handleSelectQuery(query)}>Edit</button>
+                <button onClick={() => handleEditQuery(query)}>
+                  Save Changes
+                </button>
+                <button
+                  className={`query ${selectedQuery === query ? 'selected' : ''}`}
                   onClick={() => {
                     setSelectedQuery(query);
-                  }} buttonSize={'btn--small'}>Select</Button>}
+                  }}>Select Query</button>
 
               </div>
             ))}
