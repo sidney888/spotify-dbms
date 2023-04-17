@@ -22,7 +22,7 @@ for (const numeric_metric of numeric_track_metrics) {
 	numeric_album_metrics.push("Range of " + numeric_metric);
 }
 
-const nonnumeric_metric_sql = [
+const nonnumeric_metric_sql = {
 	"Release Date"   : "ReleaseDate",
 	"Track Name"     : "TrackName",
 	"Album Name"     : "AlbumName",
@@ -31,7 +31,7 @@ const nonnumeric_metric_sql = [
 	"Time Signature" : "TimeSignature",
 	"Album Type"     : "AlbumType",
 	"Artist Genre"   : "CategorizedGenre"
-];
+};
 
 const nonnumeric_metrics = Object.keys(nonnumeric_metric_sql);
 
