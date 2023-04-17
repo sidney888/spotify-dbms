@@ -25,7 +25,7 @@ const Graph = () => {
       return a[0] - b[0];
     });
   }
-
+  //labels depend on the input from the queries
   let labels;
   if(dataArray[0].length === 2){
     labels: dataArray.map((item) => item[xIndex].toString()) // use year or month/year as label depending on the format
@@ -53,7 +53,7 @@ const Graph = () => {
   };
 
   const canvasRef = useRef(null);
-
+  //display the graph
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');

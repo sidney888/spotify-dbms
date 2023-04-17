@@ -2,7 +2,7 @@ import Button  from '../Components/Button';
 import AnalysisPage from './AnalysisPage';
 import React, { useState, useEffect } from 'react';
 import './TrendsPage.css';
-import { Line } from 'react-chartjs-2';
+//import { Line } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 import Graph from '../Components/Graph';
 import Table from '../Components/Table';
