@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Dropdown from '../Components/Dropdown';
 import Button from '../Components/Button';
-import { query_metrics, condition_metrics, aggregate_metrics} from '../assets/metrics.js';
+import { query_metrics, condition_metrics, aggregate_metrics } from '../assets/metrics.js';
 
 import './AnalysisPage.css';
 
@@ -33,7 +33,7 @@ class Condition {
   }
 }
 
-function AnalysisPage ({data}) {
+function AnalysisPage({ data }) {
 
   //Queries
 
@@ -50,7 +50,7 @@ function AnalysisPage ({data}) {
   const [selectedType, setSelectedType] = useState('Select');
   const type = ['Tracks', 'Albums'];
   //set query name
-  const [name, setName] = useState('') 
+  const [name, setName] = useState('')
 
   //Button (NAVIGATION)
   const [click, setClick] = useState(false);
@@ -67,20 +67,20 @@ function AnalysisPage ({data}) {
     }
   };
 
-  const [errorMessage, setErrorMessage]= useState('');
-
+  const [errorMessage, setErrorMessage] = useState('');
   //List of queries 
   const [list, setList] = useState([]);
   const handleAddItem = () => {
-    if (name ==''){    
+    if (name.name == '') {
       setErrorMessage('Please name your query');
-    }else{
-      const newQueryID = Query.lastID + 1; // generate new ID based on previous one  
+    } else {
+      const newQueryID = Query.lastID + 1; // generate new ID based on previous one
       const newQuery = new Query(selectedFrequency, selectedMetric, selectedType, name.name.toString(), newQueryID);
       Query.lastID = newQueryID; // update lastID to new ID
       setList([...list, newQuery]);
-      setName({name: ''});
+      setName({ name: '' });
     }
+
   };
   //when a query is selected.
   const handleSelectQuery = (Query) => {
@@ -92,10 +92,8 @@ function AnalysisPage ({data}) {
 
     setName({ name: Query.name });
   };
-  useEffect(() => {
-    console.log('Currently selected query:', selectedQuery);
-  }, [selectedQuery]);
-  
+
+
   //when a query is edited
   const handleEditQuery = () => {
     const updatedList = list.map((query) => {
@@ -115,191 +113,190 @@ function AnalysisPage ({data}) {
   };
 
 
-    
-    //Conditions
-    const [conditions, setConditions] = useState([]);
-    const[cname, setcname] = useState('');
 
-    const [selectedcmetric, setSelectedcmetric] = useState('Select');
-    const cmetrics = condition_metrics;
+  //Conditions
+  const [conditions, setConditions] = useState([]);
+  const [cname, setcname] = useState('');
 
-    const[selectedoperator, setSelectedOperator] = useState('Select');
-    const operators = ['>', '<', '>=', '<=', '=', '!='];
+  const [selectedcmetric, setSelectedcmetric] = useState('Select');
+  const cmetrics = condition_metrics;
 
-    const[cvalue, setcvalue] = useState('');
+  const [selectedoperator, setSelectedOperator] = useState('Select');
+  const operators = ['>', '<', '>=', '<=', '=', '!='];
 
-    const[qID, setqID] = useState();
+  const [cvalue, setcvalue] = useState('');
 
-    const[selected_agg_function, setSelected_agg_function] = useState('Select'); //drop down of either max, min, avg, etc.
-    const agg_functions = ['min', 'max', 'avg'];
+  const [qID, setqID] = useState();
 
-    const[selected_agg_metric, setSelected_agg_metric] = useState('Select');
-    const agg_metrics = aggregate_metrics; //still need to update and make dropdown for.
+  const [selected_agg_function, setSelected_agg_function] = useState('Select'); //drop down of either max, min, avg, etc.
+  const agg_functions = ['min', 'max', 'avg'];
 
-    const handleAddCondition = () => {
-      const newCondition = new Condition(cname.cname.toString(), selectedcmetric, selectedoperator, selected_agg_function, selected_agg_metric, cvalue, selectedQuery.queryID);
-      setConditions([...conditions, newCondition]); //adds a new condition to the list of conditions.
-      setcname({cname: ''});
-    };
-  
-    const updateCondition = (index, field, value) => {
-      const newConditions = [...conditions];
-      newConditions[index][field] = value;
-      setConditions(newConditions);
-    };
+  const [selected_agg_metric, setSelected_agg_metric] = useState('Select');
+  const agg_metrics = aggregate_metrics; //still need to update and make dropdown for.
 
+  const handleAddCondition = () => {
+    const newCondition = new Condition(cname.cname.toString(), selectedcmetric, selectedoperator, selected_agg_function, selected_agg_metric, cvalue, selectedQuery.queryID);
+    setConditions([...conditions, newCondition]); //adds a new condition to the list of conditions.
+    if(!selectedQuery.condtions){
+      selectedQuery.conditions = [];
+    }
+    selectedQuery.conditions.push(newCondition); //adds condition to the selected query list.
+    setcname({cname: '' });
+    //add this condition to the selected query condition list.
+  };
 
+  useEffect(() => {
+    console.log('Currently selected query:', selectedQuery);
+    console.log('Conditions: ', conditions);
+  }, [selectedQuery, conditions]);
   return (
     <>
-    <h1>
-      Input for Trend Analysis
-    </h1>
-    <p>
-    In the Create Queries section, pick the frequency, metric, and type from the respective dropdown menus.
-    <br/>The Create Conditions section can help narrow your search. Add conditions and comparisions with specific values.
-    </p>
-    <div className="analysis-page">
-      <div className="create-queries">
-        <h2>Create Queries</h2>
-        <div className="query-options">
-          
-          <div className='freq'>
-            <h3>Frequency:   </h3>
-          <Dropdown
-            className="Frequency"
-            selectedOption={selectedFrequency}
-            options={frequencies}
-            onOptionClick={(frequency) => setSelectedFrequency(frequency)}
-          />
-          </div>
-          <div className='met'>
-            <h3>Metric:   </h3>          
-          <Dropdown
-            className="Metric"
-            selectedOption={selectedMetric}
-            options={metrics}
-            onOptionClick={(metric) => setSelectedMetric(metric)}
-          />
-          </div>
-          <div className='typ'>
-            <h3>Type:   </h3>
-          <Dropdown
-            className="Type"
-            selectedOption={selectedType}
-            options={type}
-            onOptionClick={(queryType) => setSelectedType(queryType)}
-          />
-          </div>
-          <div className='names'>
-            <h3>Query Name: </h3>
-          <input
-          type="name"
-          value={name.name || ''}
-          onChange={(event) => {
-            setName({ ...name, name: event.target.value });
-          }}
-          />
-          </div>
-          <button onClick={handleAddItem}>Add Query</button>
-          {errorMessage && <p style={{color:'red'}}>{errorMessage}</p>}
-    
-        </div>
-        <div className='queries'> 
-  {list.map((query, index) => (
-    <div key={query.queryID}>
+      <h1>
+        Input for Trend Analysis
+      </h1>
       <p>
-        {index + 1}: {query.name}
+        In the Create Queries section, pick the frequency, metric, and type from the respective dropdown menus.
+        <br />The Create Conditions section can help narrow your search. Add conditions and comparisions with specific values.
       </p>
-      <button onClick={() => handleSelectQuery(query)}>Edit</button>
-      <button onClick={() => handleEditQuery(query)}>
-        Save Changes
-      </button>
-    
-    </div>
-  ))}
-</div>
-      </div>
-      <div className="create-conditions">
-      <h2>Create Conditions</h2>
-      <div className="input_name">
-        <h3>Name: </h3>
-        <input
-          type="string"
-          placeholder="Name"
-          value={cname.cname || ''}
-          onChange={(event) => {
-            setcname({ ...cname, cname: event.target.value });
-          }}
-        />
-      </div>
-      <div className="input_metric">
-        <h3>Metric:</h3>
-        <Dropdown
-          className="Metric"
-          selectedOption={selectedcmetric}
-          options={cmetrics}
-          onOptionClick={(cmetric) => setSelectedcmetric(cmetric)}
-        />
-      </div>
-      <div className="input_operator">
-        <h3>Comparison:</h3>
-        <Dropdown
-          className="Operator"
-          selectedOption={selectedoperator}
-          options={operators}
-          onOptionClick={(operator) => setSelectedOperator(operator)}
-        />
-      </div>
-      <div className="input_value">
-        <h3>Value:</h3>
-        <input
-          type="num"
-          placeholder="Value"
-          value={cvalue || ''}
-          onChange={(event) => {
-            setcvalue(event.target.value);
-          }}
-        />
-      </div>
-      <div className="input_aggf">
-        <h3>Aggregate Function:</h3>
-        <Dropdown
-          className="aggf"
-          selectedOption={selected_agg_function}
-          options={agg_functions}
-          onOptionClick={(agg_function) => setSelected_agg_function(agg_function)}
-        />
-      </div>
-      <div className="input_aggm">
-        <h3>Aggregate Metric:</h3>
-        <Dropdown
-          className="aggm"
-          selectedOption={setSelected_agg_metric}
-          options={agg_metrics}
-          onOptionClick={(agg_metric) => setSelected_agg_metric(agg_metric)}
-        />
-      </div>
-      <Button onClick={handleAddCondition}>Add Condition</Button>
+      <div className="analysis-page">
+        <div className="create-queries">
+          <h2>Create Queries</h2>
+          <div className="query-options">
 
-      {/* {conditions.map((condition, index) => (
-        <div key={index} className="condition">
-          <div className="cmet">
-            <h3>Metric: </h3>
-            <p>{condition.metric}</p>
+            <div className='freq'>
+              <h3>Frequency:   </h3>
+              <Dropdown
+                className="Frequency"
+                selectedOption={selectedFrequency}
+                options={frequencies}
+                onOptionClick={(frequency) => setSelectedFrequency(frequency)}
+              />
+            </div>
+            <div className='met'>
+              <h3>Metric:   </h3>
+              <Dropdown
+                className="Metric"
+                selectedOption={selectedMetric}
+                options={metrics}
+                onOptionClick={(metric) => setSelectedMetric(metric)}
+              />
+            </div>
+            <div className='typ'>
+              <h3>Type:   </h3>
+              <Dropdown
+                className="Type"
+                selectedOption={selectedType}
+                options={type}
+                onOptionClick={(queryType) => setSelectedType(queryType)}
+              />
+            </div>
+            <div className='names'>
+              <h3>Query Name: </h3>
+              <input
+                type="name"
+                value={name.name || ''}
+                onChange={(event) => {
+                  setName({ ...name, name: event.target.value });
+                }}
+              />
+            </div>
+            <button onClick={handleAddItem}>Add Query</button>
+
           </div>
-          <div className="operator">
-            <h3>Comparison: </h3>
-            <p>{condition.operator}</p>
-          </div>
-          <div className="input">
-            <h3>Value: </h3>
-            <p>{condition.value}</p>
+          <div className='queries'>
+            {list.map((query, index) => (
+              <div key={query.queryID}>
+                <p>
+                  {index + 1}: {query.name}
+                </p>
+                <button onClick={() => handleSelectQuery(query)}>Edit</button>
+                <button onClick={() => handleEditQuery(query)}>
+                  Save Changes
+                </button>
+                <button
+                  className={`query ${selectedQuery === query ? 'selected' : ''}`}
+                  onClick={() => {
+                    setSelectedQuery(query);
+                  }}>Select Query</button>
+
+              </div>
+            ))}
           </div>
         </div>
-      ))} */}
-    </div>
-    </div>
-    {button && <Button to ='/TrendsPage' >Find Trends!</Button>}
+        <div className="create-conditions">
+          <h2>Create Conditions</h2>
+          <div className="input_name">
+            <h3>Name: </h3>
+            <input
+              type="string"
+              placeholder="Name"
+              value={cname.cname || ''}
+              onChange={(event) => {
+                setcname({ ...cname, cname: event.target.value });
+              }}
+            />
+          </div>
+
+          <div className="input_metric">
+            <h3>Metric:</h3>
+            <Dropdown
+              className="Metric"
+              selectedOption={selectedcmetric}
+              options={cmetrics}
+              onOptionClick={(cmetric) => setSelectedcmetric(cmetric)}
+            />
+          </div>
+          <div className="input_operator">
+            <h3>Comparison:</h3>
+            <Dropdown
+              className="Operator"
+              selectedOption={selectedoperator}
+              options={operators}
+              onOptionClick={(operator) => setSelectedOperator(operator)}
+            />
+          </div>
+          <div className="input_value">
+            <h3>Value:</h3>
+            <input
+              type="num"
+              placeholder="Value"
+              value={cvalue || ''}
+              onChange={(event) => {
+                setcvalue(event.target.value);
+              }}
+            />
+          </div>
+          <div className="input_aggf">
+            <h3>Aggregate Function:</h3>
+            <Dropdown
+              className="aggf"
+              selectedOption={selected_agg_function}
+              options={agg_functions}
+              onOptionClick={(agg_function) => setSelected_agg_function(agg_function)}
+            />
+          </div>
+          <div className="input_aggm">
+            <h3>Aggregate Metric:</h3>
+            <Dropdown
+              className="aggm"
+              selectedOption={selected_agg_metric}
+              options={agg_metrics}
+              onOptionClick={(agg_metric) => setSelected_agg_metric(agg_metric)}
+            />
+          </div>
+          <Button onClick={handleAddCondition}>Add Condition</Button>
+
+        </div>
+
+      </div>
+      <div className="created-conditions">
+        <h2>Created Conditions</h2>
+        <ol>
+          {conditions.map((condition, index) => (
+            <li key={index}>{condition.cname}</li>
+          ))}
+        </ol>
+      </div>
     </>
   );
 };
