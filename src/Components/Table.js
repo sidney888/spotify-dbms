@@ -4,6 +4,7 @@ import './Table.css';
 const Table = ({ data }) => {
   const dataArray = data;
   let xIndex, yIndex;
+  
   //basically sorts the data to be put in the table same way as the graph.
   if (dataArray[0].length === 2) {
     // check if the input is in [year, value] format
