@@ -13,16 +13,16 @@
    
 }
 
-.tableside{
+.tableside {
     display: flex;
     flex-direction: column;
     width: 450px;
-    height: 500px;
+    min-height: 500px; /* use min-height instead of height */
     background-color: #1DB954;
     border-radius: 15px;
     padding: 15px;
-    margin: 20px
-}
+    margin: 20px;
+  }
  .graphside{
     display: flex;
     flex-direction: column;
