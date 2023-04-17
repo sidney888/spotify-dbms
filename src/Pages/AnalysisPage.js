@@ -204,14 +204,12 @@ function AnalysisPage({ data }) {
   return (
     <>
      <div className="profile">
-      <Link to="/TrendsPage">
+      <Link to="/">
         <img src={logo} alt="Spotify Logo" className="logo" />
         </Link>
         <h1 className="welcome-message">
         STAMP: Spotify Trend Analysis for Musical Professionals</h1>
     </div>
-
-
       <h1>
         Input for Trend Analysis
       </h1>
@@ -264,22 +262,19 @@ function AnalysisPage({ data }) {
             {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
 
           </div>
-          <div className='queries'>
+          <div className='created-queries'>
             <h3>Your Queries</h3>
             {list.map((query, index) => (
               <div key={query.queryID}>
                 <p>
                   {index + 1}: {query.name}
                 </p>
-                <button onClick={() => handleSelectQuery(query)}>Edit</button>
-                <button onClick={() => handleEditQuery(query)}>
-                  Save Changes
-                </button>
-                <button
-                  className={`query ${selectedQuery === query ? 'selected' : ''}`}
+                {button &&<Button buttonStyle={'btn--outline'} onClick={handleSelectQuery} buttonSize={'btn--small'}>Edit</Button>}
+                {button &&<Button buttonStyle={'btn--outline'} onClick={handleEditQuery} buttonSize={'btn--small'}>Save Changes</Button>}
+                {button &&<Button  buttonStyle={'btn--outline'} className={`query ${selectedQuery === query ? 'selected' : ''}`}
                   onClick={() => {
                     setSelectedQuery(query);
-                  }}>Select Query</button>
+                  }} buttonSize={'btn--small'}>Select</Button>}
 
               </div>
             ))}
@@ -290,7 +285,6 @@ function AnalysisPage({ data }) {
      
     </div>
         </div>
-        
         <div className="create-conditions">
           <h2>Create Conditions</h2>
           <div className='sides'>

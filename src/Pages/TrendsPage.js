@@ -14,7 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
     return (
       <>
        <div className="profile">
-      <Link to="/TrendsPage">
+      <Link to="/">
         <img src={logo} alt="Spotify Logo" className="logo" />
         </Link>
         <h1 className="welcome-message">
