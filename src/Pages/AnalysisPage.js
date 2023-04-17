@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Dropdown from '../Components/Dropdown';
 import Button from '../Components/Button';
-import { query_metrics, condition_metrics, aggregate_metrics } from '../assets/metrics.js';
+import { query_metrics_track, query_metrics_album, aggregate_metrics_track, aggregate_metrics_album, condition_metrics_track, condition_metrics_album } from '../assets/metrics.js';
 
 import './AnalysisPage.css';
 
@@ -44,11 +44,28 @@ function AnalysisPage({ data }) {
   const [selectedQueryID, setSelectedQueryID] = useState(null);
   const [selectedQuery, setSelectedQuery] = useState(null); // keeps track of the selected query. 
   //set query metric
-  const [selectedMetric, setSelectedMetric] = useState('Select');
-  const metrics = query_metrics;
-  //set query type
+
+  const type = ['Tracks', 'Albums']; //set query type
   const [selectedType, setSelectedType] = useState('Select');
-  const type = ['Tracks', 'Albums'];
+  
+
+
+  const [selectedMetric, setSelectedMetric] = useState('Select');
+  const [metrics, setMetrics] = useState([]);
+
+  useEffect(() => {
+    if(selectedType){
+      if (selectedType === 'Tracks') {
+        setMetrics(query_metrics_track);
+      } else if (selectedType === 'Albums') {
+        setMetrics(query_metrics_album);
+      }
+    }
+    
+  }, [selectedType]);
+
+  
+  
   //set query name
   const [name, setName] = useState('')
 
@@ -119,31 +136,46 @@ function AnalysisPage({ data }) {
   const [cname, setcname] = useState('');
 
   const [selectedcmetric, setSelectedcmetric] = useState('Select');
-  const cmetrics = condition_metrics;
+  const [cmetrics, setcmetrics] = useState([]);
 
   const [selectedoperator, setSelectedOperator] = useState('Select');
   const operators = ['>', '<', '>=', '<=', '=', '!='];
 
   const [cvalue, setcvalue] = useState('');
 
-  const [qID, setqID] = useState();
+  const [qID, setqID] = useState('');
 
-  const [selected_agg_function, setSelected_agg_function] = useState('Select'); //drop down of either max, min, avg, etc.
-  const agg_functions = ['min', 'max', 'avg'];
+  const [selected_agg_function, setSelected_agg_function] = useState('Select'); //drop down of either max, min
+  const agg_functions = ['min', 'max'];
 
   const [selected_agg_metric, setSelected_agg_metric] = useState('Select');
-  const agg_metrics = aggregate_metrics; //still need to update and make dropdown for.
+  const [agg_metrics, setaggmetrics] = useState([]); //still need to update and make dropdown for.
 
   const handleAddCondition = () => {
-    const newCondition = new Condition(cname.cname.toString(), selectedcmetric, selectedoperator, selected_agg_function, selected_agg_metric, cvalue, selectedQuery.queryID);
+    const newCondition = new Condition(cname.cname.toString(), selectedcmetric, selectedoperator, selected_agg_function, selected_agg_metric, cvalue, qID && qID.qID ? qID.qID.toString() : null);
     setConditions([...conditions, newCondition]); //adds a new condition to the list of conditions.
-    if(!selectedQuery.condtions){
+    if(!Array.isArray(selectedQuery.conditions)){
       selectedQuery.conditions = [];
     }
     selectedQuery.conditions.push(newCondition); //adds condition to the selected query list.
     setcname({cname: '' });
     //add this condition to the selected query condition list.
   };
+
+
+  //organizing the correct metrics based on query type:
+  
+  useEffect(() => {
+    if(selectedQuery){
+      if (selectedQuery.type === 'Tracks') {
+        setcmetrics(condition_metrics_track);
+        setaggmetrics(aggregate_metrics_track);
+      } else if (selectedQuery.type === 'Albums') {
+        setcmetrics(condition_metrics_album);
+        setaggmetrics(aggregate_metrics_album);
+      }
+    }
+  }, [selectedQuery]);
 
   useEffect(() => {
     console.log('Currently selected query:', selectedQuery);
@@ -162,7 +194,16 @@ function AnalysisPage({ data }) {
         <div className="create-queries">
           <h2>Create Queries</h2>
           <div className="query-options">
-
+          <div className='names'>
+              <h3>Query Name: </h3>
+              <input
+                type="name"
+                value={name.name || ''}
+                onChange={(event) => {
+                  setName({ ...name, name: event.target.value });
+                }}
+              />
+            </div>
             <div className='freq'>
               <h3>Frequency:   </h3>
               <Dropdown
@@ -170,15 +211,6 @@ function AnalysisPage({ data }) {
                 selectedOption={selectedFrequency}
                 options={frequencies}
                 onOptionClick={(frequency) => setSelectedFrequency(frequency)}
-              />
-            </div>
-            <div className='met'>
-              <h3>Metric:   </h3>
-              <Dropdown
-                className="Metric"
-                selectedOption={selectedMetric}
-                options={metrics}
-                onOptionClick={(metric) => setSelectedMetric(metric)}
               />
             </div>
             <div className='typ'>
@@ -190,14 +222,13 @@ function AnalysisPage({ data }) {
                 onOptionClick={(queryType) => setSelectedType(queryType)}
               />
             </div>
-            <div className='names'>
-              <h3>Query Name: </h3>
-              <input
-                type="name"
-                value={name.name || ''}
-                onChange={(event) => {
-                  setName({ ...name, name: event.target.value });
-                }}
+            <div className='met'>
+              <h3>Metric:   </h3>
+              <Dropdown
+                className="Metric"
+                selectedOption={selectedMetric}
+                options={metrics}
+                onOptionClick={(metric) => setSelectedMetric(metric)}
               />
             </div>
             <button onClick={handleAddItem}>Add Query</button>
@@ -263,6 +294,16 @@ function AnalysisPage({ data }) {
               value={cvalue || ''}
               onChange={(event) => {
                 setcvalue(event.target.value);
+              }}
+            />
+          </div>
+          <div className="input_qid">
+            <h3>Query to aggregate:</h3>
+            <input
+              placeholder="Query ID"
+              value={qID.qID || ''}
+              onChange={(event) => {
+                setqID({...qID, qID: event.target.value});
               }}
             />
           </div>
