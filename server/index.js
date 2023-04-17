@@ -1,7 +1,10 @@
 const { connAttrs } = require("./config");
 const {
 	numeric_track_metrics,
+	numeric_album_metrics,
 	nonnumeric_metrics,
+	discrete_metrics,
+	string_metrics,
 	track_metrics,
 	metric_sql
 } = require("../src/assets/metrics");
@@ -78,6 +81,72 @@ function eval_order(dependencies, root, in_order = null, done = null) {
 	return in_order;
 }
 
+function parse(value, metric) {
+	if (string_metrics.includes(metric)) {
+		return `'${value}'`;
+	} else if (metric == "Release Date") {
+		return `TIMESTAMP '${value}'`;
+	} else {
+		return value;
+	}
+}
+
+function from_clause(query_table) {
+	let from = `FROM NBUTAKOW.ALBUM\n`;
+	if (query_table.has("Writes")) {
+		from +=
+			`INNER JOIN (
+			SELECT *
+			FROM EDWARDARZOUMANOV.TRACK
+			INNER JOIN EDWARDARZOUMANOV.WRITES
+			ON TrackID = WrittenTrack
+			UNION ALL
+			SELECT *
+			FROM "LAUREN.MARIMON".TRACK
+			INNER JOIN "LAUREN.MARIMON".WRITES
+			ON TrackID = WrittenTrack
+			UNION ALL
+			SELECT *
+			FROM SIDNEYTEBBAL.TRACK
+			INNER JOIN SIDNEYTEBBAL.WRITES
+			ON TrackID = WrittenTrack
+			) ON AlbumID = PartOf\n`;
+		if (query_table.has("Artist")) {
+			from += `INNER JOIN NBUTAKOW.ARTIST ON WriterArtist = ArtistID\n`;
+		}
+	} else {
+		if (query_table.has("Track")) {
+			from +=
+				`INNER JOIN (
+				SELECT *
+				FROM EDWARDARZOUMANOV.TRACK
+				UNION ALL
+				SELECT *
+				FROM "LAUREN.MARIMON".TRACK
+				UNION ALL
+				SELECT *
+				FROM SIDNEYTEBBAL.TRACK
+				) ON AlbumID = PartOf\n`;
+		}
+		if (query_table.has("Releases")) {
+			from += `INNER JOIN NBUTAKOW.RELEASES ON AlbumID = ReleasedAlbum\n`;
+			if (query_table.has("Artist")) {
+				from += `INNER JOIN NBUTAKOW.ARTIST ON ReleasingArtist = ArtistID\n`;
+			}
+		}
+	}
+	if (query_table.has("Categorized As")) {
+		if (query_table.has("Artist")) {
+			from += `INNER JOIN NBUTAKOW.CATEGORIZED_AS ON ArtistID = CategorizedArtist\n`;
+		} else if (query_table.has("Releases")) {
+			from += `INNER JOIN NBUTAKOW.CATEGORIZED_AS ON ReleasingArtist = CategorizedArtist\n`;
+		} else if (query_table.has("Writes")) {
+			from += `INNER JOIN NBUTAKOW.CATEGORIZED_AS ON WriterArtist = CategorizedArtist\n`;
+		}
+	}
+	return from;
+}
+
 app.get("/api/count", (req, res) => {
 	count().then(result => {
 		res.json(result);
@@ -87,117 +156,217 @@ app.get("/api/count", (req, res) => {
 });
 
 app.get("/api/analyze", (req, res) => {
-	const { queries, analyze } = JSON.parse(req.query.q);
+	let { queries, analyze } = JSON.parse(req.query.q);
+	analyze = analyze.toString();
 	const dependencies = {};
 	const clauses = {};
+	const groups = {};
+	const query_tables = {};
 	for (const id in queries) {
 		dependencies[id] = [];
 		for (const condition of queries[id].conditions) {
-			if (condition.agg_function !== null) {
-				dependencies[id].push(condition.value.toString());
+			if (condition.cvalue == "") {
+				dependencies[id].push(condition.qID);
 			}
 		}
 	}
-	const order = eval_order(dependencies, analyze.toString());
+	const order = eval_order(dependencies, analyze);
 	for (const id of order) {
 		const query = queries[id];
-		const clause = {};
-		const query_tables = new Set();
-		let artist_relation = "";
-		clause.from = `FROM NBUTAKOW.ALBUM\n`; // ALBUM is always needed to get ReleaseDate
-		switch (query.type) {
-			case "Tracks":
-				artist_relation = "Writes";
-				query_tables.add("Track");
-				break;
-			case "Albums":
-				artist_relation = "Releases";
+		const type = query.type;
+		const query_table = new Set();
+		const track_attributes = new Set();
+		let artist_relation;
+		let from = `FROM NBUTAKOW.ALBUM\n`; // ALBUM is always needed to get ReleaseDate
+		let where = ``;
+		let group_by = ``;
+		let tuple_keyword = `WHERE`;
+		let group_keyword =
+			`GROUP BY AlbumID, ReleaseDate
+			HAVING`;
+		if (type == "Tracks") {
+			query_table.add("Track");
+			artist_relation = "Writes";
+		} else if (type == "Albums") {
+			artist_relation = "Releases";
 		}
 		for (const condition of query.conditions) {
-			const metric = condition.metric;
-			if (metric == "Number of Artists") {
-				query_tables.add(artist_relation);
-			} else if (metric == "Artist Name") {
-				query_tables.add("Artist");
-				query_tables.add(artist_relation);
+			const metric = condition.cmetric;
+			const con_attribute = metric_sql[metric];
+			const agg_attribute = metric_sql[condition.agg_metric];
+			const qID = condition.qID;
+			const agg_metric = numeric_album_metrics.includes(metric);
+			let track_metric;
+			if (agg_metric) {
+				track_metric = con_attribute.split("(")[1].split(")")[0];
+				track_attributes.add(track_metric);
+			}
+			let value = condition.cvalue;
+			if (metric == "Artist Name") {
+				query_table.add("Artist");
+				query_table.add(artist_relation);
 			} else if (metric == "Artist Genre") {
-				query_tables.add("Categorized As");
-				query_tables.add("Artist");
-				query_tables.add(artist_relation);
-			} else if (track_metrics.includes(condition.metric)) {
-				query_tables.add("Track");
+				query_table.add("Categorized As");
+				query_table.add(artist_relation);
+			} else if (type == "Albums" && track_metrics.includes(metric)) {
+				query_table.add("Track");
 			}
-		}
-		if (query_tables.has("Writes")) {
-			clause.from +=
-				`INNER JOIN (
-				SELECT *
-				FROM EDWARDARZOUMANOV.TRACK
-				INNER JOIN EDWARDARZOUMANOV.WRITES
-				ON TrackID = WrittenTrack
-				UNION ALL
-				SELECT *
-				FROM "LAUREN.MARIMON".TRACK
-				INNER JOIN "LAUREN.MARIMON".WRITES
-				ON TrackID = WrittenTrack
-				UNION ALL
-				SELECT *
-				FROM SIDNEYTEBBAL.TRACK
-				INNER JOIN SIDNEYTEBBAL.WRITES
-				ON TrackID = WrittenTrack
-				) ON AlbumID = PartOf\n`;
-			if (query_tables.has("Artist")) {
-				clause.from += `INNER JOIN NBUTAKOW.ARTIST ON WriterArtist = ArtistID\n`;
+			if (value != "") {
+				value = parse(value, metric);
+			} else {
+				const tracks = queries[qID].type == "Tracks";
+				const artist_relation = tracks ? "Writes" : "Releases";
+				const subquery_table = new Set(query_tables[qID]);
+				if (metric == "Artist Name") {
+					subquery_table.add("Artist");
+					subquery_table.add(artist_relation);
+				} else if (metric == "Artist Genre") {
+					subquery_table.add("Categorized As");
+					subquery_table.add(artist_relation);
+				} else if (!tracks && track_metrics.includes(metric)) {
+					subquery_table.add("Track");
+				}
+				const clause = clauses[qID];
+				const clause_template =
+					`${clause.prefix}
+					${from_clause(subquery_table)}
+					${clause.where}
+					${clause.suffix}`;
+				if (agg_attribute == `COUNT(*)`) {
+					const type_sql = tracks ? `TrackID` : `AlbumID`;
+					value =
+						`(
+						SELECT ${con_attribute}
+						${agg_metric ?
+						`FROM
+						(
+						SELECT DISTINCT TrackID, ${track_metric}, AlbumID`: ""}
+						${clause_template}
+						GROUP BY ${con_attribute}
+						HAVING COUNT(DISTINCT ${type_sql}) =
+						(
+						SELECT COUNT(DISTINCT ${type_sql})
+						${clause_template}
+						GROUP BY ${con_attribute}
+						ORDER BY COUNT(DISTINCT ${type_sql}) ${(condition.agg_function == "max") ? "DESC" : "ASC"}
+						FETCH FIRST 1 ROWS ONLY
+						)
+						FETCH FIRST 1 ROWS ONLY
+						)
+						${agg_metric ?
+						`)
+						GROUP BY AlbumID` : ""}`;
+				} else {
+					value =
+						`(
+						SELECT ${con_attribute}
+						${agg_metric ?
+						`FROM
+						(
+						SELECT DISTINCT TrackID, ${track_metric}, AlbumID` : ""}
+						${clause_template}
+						AND ${agg_attribute} =
+						(
+						SELECT ${agg_attribute}
+						${clause_template}
+						ORDER BY ${agg_attribute} ${(condition.agg_function == "max") ? "DESC" : "ASC"}
+						FETCH FIRST 1 ROWS ONLY
+						)
+						FETCH FIRST 1 ROWS ONLY
+						)
+						${agg_metric ?
+						`)
+						GROUP BY AlbumID` : ""}`;
+				}
 			}
-		} else {
-			if (query_tables.has("Track")) {
-				clause.from +=
-					`INNER JOIN (
-					SELECT *
-					FROM EDWARDARZOUMANOV.TRACK
-					UNION ALL
-					SELECT *
-					FROM "LAUREN.MARIMON".TRACK
-					UNION ALL
-					SELECT *
-					FROM SIDNEYTEBBAL.TRACK
-					) ON AlbumID = PartOf\n`;
-			}
-			if (query_tables.has("Releases")) {
-				clause.from += `INNER JOIN NBUTAKOW.RELEASES ON AlbumID = ReleasedAlbum\n`;
-				if (query_tables.has("Artist")) {
-					clause.from += `INNER JOIN NBUTAKOW.ARTIST ON ReleasingArtist = ArtistID\n`;
+			if (agg_metric) {
+				group_by += `${group_keyword} ${con_attribute} ${condition.operator} ${value}\n`;
+				if (group_keyword != `AND`) {
+					group_keyword = `AND`;
+				}
+			} else {
+				where += `${tuple_keyword} ${con_attribute} ${condition.operator} ${value}\n`;
+				if (tuple_keyword != `AND`) {
+					tuple_keyword = `AND`;
 				}
 			}
 		}
-		if (query_tables.has("Categorized As")) {
-			clause.from += `INNER JOIN NBUTAKOW.CATEGORIZED_AS ON ArtistID = CategorizedArtist\n`;
-		}
-		clauses[id] = clause;
+		clauses[id] = {
+			prefix:
+				`${(group_by == `` ? `` :
+				`FROM
+				(
+				SELECT DISTINCT TrackID, ${Array.from(track_attributes).join(", ")}, AlbumID, ReleaseDate`)}`,
+			from: from_clause(query_table),
+			where: where,
+			suffix:
+				`${(group_by == `` ? `` :
+				`)`)}
+				${group_by}`
+		};
+		query_tables[id] = query_table;
 	}
-	res.json(clauses);
+	const query = queries[analyze];
+	const query_metric = query.metric;
+	const count = query_metric == "Volume";
+	const monthly = query.frequency == "Monthly";
+	const clause = clauses[analyze];
+	const query_table = new Set(query_tables[analyze]);
+	const tracks = query.type == "Tracks";
+	const con_attribute = metric_sql[query_metric];
+	const agg_metric = numeric_album_metrics.includes(query_metric);
+	const artist_relation = tracks ? "Writes" : "Releases";
+	let track_metric;
+	if (agg_metric) {
+		track_metric = con_attribute.split("(")[1].split(")")[0];
+	}
+	if (query_metric == "Artist Name") {
+		query_table.add("Artist");
+		query_table.add(artist_relation);
+	} else if (query_metric == "Artist Genre") {
+		query_table.add("Categorized As");
+		query_table.add(artist_relation);
+	} else if (!tracks && track_metrics.includes(query_metric)) {
+		query_table.add("Track");
+	}
+	let prefix = ``;
+	let suffix = ``;
+	if (agg_metric) {
+		prefix =
+			`FROM
+			(
+			SELECT DISTINCT TrackID, ${track_metric}, AlbumID, ReleaseDate`;
+		suffix =
+			`)
+			GROUP BY AlbumID, ReleaseDate`;
+	} else if (query_metric == "Number of Artists") {
+		prefix =
+			`FROM
+			(
+			SELECT DISTINCT TrackID, ArtistID, ReleaseDate`;
+		suffix =
+			`)
+			GROUP BY TrackID, ReleaseDate`;
+		query_table.add("Artist");
+		query_table.add(artist_relation);
+	}
+	res.json(
+		`SELECT ${monthly ? "Month," : ""} Year, ${count ? "COUNT(*)" : `AVG(QueryMetric)`}
+		FROM
+		(
+		SELECT DISTINCT ${tracks ? "TrackID" : "AlbumID"}${count ? "" : `, ${con_attribute} AS QueryMetric`},
+		EXTRACT(YEAR FROM ReleaseDate) AS Year${monthly ? ", EXTRACT(MONTH FROM ReleaseDate) AS Month" : ""}
+		${prefix}
+		${clause.prefix}
+		${from_clause(query_table)}
+		${clause.where}
+		${clause.suffix}
+		${suffix}
+		)
+		GROUP BY Year${monthly ? ", Month" : ""}`.replaceAll("\t", "").replaceAll(/\n\s*\n/g,"\n").replaceAll(/ \s* /g, " ")
+	);
 	/*execute(
-		`SELECT Year, COUNT(*)
-		FROM
-		(
-		SELECT EXTRACT(YEAR FROM ReleaseDate) AS Year
-		FROM
-		(
-		SELECT TrackID, PartOf, Acousticness
-		FROM EDWARDARZOUMANOV.TRACK
-		UNION ALL
-		SELECT TrackID, PartOf, Acousticness
-		FROM "LAUREN.MARIMON".TRACK
-		UNION ALL
-		SELECT TrackID, PartOf, Acousticness
-		FROM SIDNEYTEBBAL.TRACK
-		)
-		INNER JOIN NBUTAKOW.ALBUM ON PartOf = AlbumID
-		WHERE ReleaseDate >= DATE '1960-01-01'
-		AND ReleaseDate <= DATE '1980-12-31'
-		AND Acousticness < 0.5
-		)
-		GROUP BY Year`
+	 * beautiful query
 	).then(result => {
 		res.json(result.rows);
 	}).catch(err => {
