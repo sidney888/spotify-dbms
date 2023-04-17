@@ -3,18 +3,14 @@ import './Table.css';
 
 const Table = ({ data }) => {
   const dataArray = data;
-  let xIndex, yIndex;
+  const year_only = dataArray[0].length === 2;
   
   //basically sorts the data to be put in the table same way as the graph.
-  if (dataArray[0].length === 2) {
+  if (year_only) {
     // check if the input is in [year, value] format
-    xIndex = 0;
-    yIndex = 1;
     dataArray.sort((a, b) => a[0] - b[0]);
   } else {
     // assume the input is in [month, year, value] format
-    xIndex = 1;
-    yIndex = 2;
     dataArray.sort((a, b) => {
       // compare year
       if (a[1] !== b[1]) {
@@ -30,15 +26,17 @@ const Table = ({ data }) => {
       <table>
         <thead>
           <tr>
-            <th>Date</th>
+	    {year_only ? "" : <th>Month</th>}
+            <th>Year</th>
             <th>Value</th>
           </tr>
         </thead>
         <tbody>
           {dataArray.map((item, index) => (
             <tr key={index}>
-              <td>{item[xIndex]}</td>
-              <td>{item[yIndex]}</td>
+              <td>{item[0]}</td>
+              <td>{item[1]}</td>
+	      {year_only ? "" : <td>{item[2]}</td>}
             </tr>
           ))}
         </tbody>

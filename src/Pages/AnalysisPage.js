@@ -270,7 +270,7 @@ function AnalysisPage({ data }) {
             {list.map((query, index) => (
               <div key={query.queryID}>
                 <p>
-                  {index + 1}: {query.name}
+                  {query.queryID}: {query.name}
                 </p>
                 <button onClick={() => handleSelectQuery(query)}>Edit</button>
                 <button onClick={() => handleEditQuery(query)}>
