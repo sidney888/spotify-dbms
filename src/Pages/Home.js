@@ -5,6 +5,7 @@ import Button  from '../Components/Button';
 const Home = () => {
     const [click, setClick] = useState(false);
     const [button, setButton] = useState(true);
+    const [count, setCount] = useState(null);
   
     const handleClick = () => setClick(!click);
     const closeMobileMenu = () => setClick(false);
@@ -20,6 +21,14 @@ const Home = () => {
     useEffect(() => {
       showButton();
     }, []); 
+    
+    function countTuples() {
+	setCount("Loading...");
+	fetch("/api/count")
+	    .then((res) => res.json())
+	    .then((count) => setCount(count));
+    }
+
     return (
         <div className="profile">
         <img src={logo} alt="Spotify Logo" className="logo" />
@@ -35,7 +44,12 @@ const Home = () => {
             </p>
         
             <p className = "getstarted">Click here to get started!</p>
-            {button && <Button to="QueryUs">Query Us!</Button>}
+            {<Button to="QueryUs">Query Us!</Button>}
+	    <br/>
+	    <br/>
+	    {<Button onClick={countTuples}>Count Tuples!</Button>}
+	    <br/>
+	    <p>{!count ? "" : count}</p>
             </div>
         </div>
     )
