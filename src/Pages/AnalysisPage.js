@@ -196,10 +196,13 @@ function AnalysisPage({ data }) {
 	  for (const query of list) {
 		  q.queries[query.queryID] = query;
 	  }
+	  setLoading("Loading...");
 	  fetch(`/api/analyze?q=${JSON.stringify(q)}`)
 	  	.then((res) => res.json())
 	  	.then((data) => navigate("/TrendsPage", {state: data}));
   }
+
+  const [loading, setLoading] = useState(null);
 
   return (
     <>
@@ -379,9 +382,8 @@ function AnalysisPage({ data }) {
         </div>
 
       </div>
-      {button &&<Button onClick={createTrend} to= '/TrendsPage'>Create Trend!</Button>}
-
-
+      {button &&<Button onClick={createTrend}>Create Trend!</Button>}
+      <p>{!loading ? "" : loading}</p>
     </>
   );
 };
