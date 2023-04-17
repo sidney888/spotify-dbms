@@ -39,7 +39,7 @@ function AnalysisPage({ data }) {
 
   //set queryFrequency
   const [selectedFrequency, setSelectedFrequency] = useState('Select');
-  const frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+  const frequencies = ['Daily', 'Monthly', 'Yearly'];
   //set queryID
   const [selectedQueryID, setSelectedQueryID] = useState(null);
   const [selectedQuery, setSelectedQuery] = useState(null); // keeps track of the selected query. 
