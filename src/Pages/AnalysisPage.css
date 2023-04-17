@@ -53,5 +53,23 @@
 }
 
 .selected {
-  background-color: yellow;
+  background-color: green;
+}
+
+.trends-button {
+  display: block;
+  margin-top: 50px;
+  padding: 10px 20px;
+  background-color: #00994d;
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 5px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.trends-button:hover {
+  background-color: #059635;
+  color: #fff;
 }

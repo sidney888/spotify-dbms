@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Dropdown from '../Components/Dropdown';
 import Button from '../Components/Button';
 import { query_metrics_track, query_metrics_album, aggregate_metrics_track, aggregate_metrics_album, condition_metrics_track, condition_metrics_album } from '../assets/metrics.js';
-
+import { Link } from 'react-router-dom';
 import './AnalysisPage.css';
 
 class Query {
@@ -253,6 +253,12 @@ function AnalysisPage({ data }) {
               </div>
             ))}
           </div>
+          <div>
+      {/* Other content */}
+      <Link to="/TrendsPage" className="trends-button">
+        <button>Create Trend!</button>
+      </Link>
+    </div>
         </div>
         <div className="create-conditions">
           <h2>Create Conditions</h2>
