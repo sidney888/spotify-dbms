@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Dropdown from '../Components/Dropdown';
 import Button from '../Components/Button';
 import { query_metrics_track, query_metrics_album, aggregate_metrics_track, aggregate_metrics_album, condition_metrics_track, condition_metrics_album } from '../assets/metrics.js';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './AnalysisPage.css';
 
 class Query {
@@ -34,7 +34,7 @@ class Condition {
 }
 
 function AnalysisPage({ data }) {
-
+  const navigate = useNavigate();
   //Queries
 
   //set queryFrequency
@@ -189,7 +189,7 @@ function AnalysisPage({ data }) {
 	  }
 	  fetch(`/api/analyze?q=${JSON.stringify(q)}`)
 	  	.then((res) => res.json())
-	  	.then((foobar) => console.log(foobar));
+	  	.then((data) => navigate("/TrendsPage", {state: data}));
   }
 
   return (
@@ -266,7 +266,7 @@ function AnalysisPage({ data }) {
           </div>
           <div>
       {/* Other content */}
-      <Link to="/TrendsPage" className="trends-button" onClick={createTrend}>
+      <Link className="trends-button" onClick={createTrend}>
         <button>Create Trend!</button>
       </Link>
     </div>
