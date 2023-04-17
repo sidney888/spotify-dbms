@@ -4,6 +4,7 @@ import Button from '../Components/Button';
 import { query_metrics_track, query_metrics_album, aggregate_metrics_track, aggregate_metrics_album, condition_metrics_track, condition_metrics_album } from '../assets/metrics.js';
 import { Link, useNavigate } from 'react-router-dom';
 import './AnalysisPage.css';
+import logo from '../assets/spotify.png';
 
 class Query {
   static lastID = 0; //keeps track of queryIDs.
@@ -88,7 +89,7 @@ function AnalysisPage({ data }) {
   //List of queries 
   const [list, setList] = useState([]);
   const handleAddItem = () => {
-    if (name.name == '') {
+    if (name == '') {
       setErrorMessage('Please name your query');
     } else {
       const newQueryID = Query.lastID + 1; // generate new ID based on previous one
@@ -130,7 +131,6 @@ function AnalysisPage({ data }) {
   };
 
 
-
   //Conditions
   const [conditions, setConditions] = useState([]);
   const [cname, setcname] = useState('');
@@ -151,15 +151,24 @@ function AnalysisPage({ data }) {
   const [selected_agg_metric, setSelected_agg_metric] = useState('Select');
   const [agg_metrics, setaggmetrics] = useState([]); //still need to update and make dropdown for.
 
+  const [errorCondition, setErrorCondition] = useState('');
+
+
   const handleAddCondition = () => {
-    const newCondition = new Condition(cname.cname.toString(), selectedcmetric, selectedoperator, selected_agg_function, selected_agg_metric, cvalue, qID && qID.qID ? qID.qID.toString() : null);
-    setConditions([...conditions, newCondition]); //adds a new condition to the list of conditions.
-    if(!Array.isArray(selectedQuery.conditions)){
-      selectedQuery.conditions = [];
+    if(cname == ''){
+      setErrorCondition('Please name your condition');
+    }else{
+      const newCondition = new Condition(cname.cname.toString(), selectedcmetric, selectedoperator, selected_agg_function, selected_agg_metric, cvalue, qID && qID.qID ? qID.qID.toString() : null);
+      setConditions([...conditions, newCondition]); //adds a new condition to the list of conditions.
+      if(!Array.isArray(selectedQuery.conditions)){
+        selectedQuery.conditions = [];
+      }
+      selectedQuery.conditions.push(newCondition); //adds condition to the selected query list.
+      setcname({cname: '' });
+      //add this condition to the selected query condition list.
+
     }
-    selectedQuery.conditions.push(newCondition); //adds condition to the selected query list.
-    setcname({cname: '' });
-    //add this condition to the selected query condition list.
+  
   };
 
 
@@ -194,6 +203,13 @@ function AnalysisPage({ data }) {
 
   return (
     <>
+     <div className="profile">
+      <Link to="/">
+        <img src={logo} alt="Spotify Logo" className="logo" />
+        </Link>
+        <h1 className="welcome-message">
+        STAMP: Spotify Trend Analysis for Musical Professionals</h1>
+    </div>
       <h1>
         Input for Trend Analysis
       </h1>
@@ -242,37 +258,37 @@ function AnalysisPage({ data }) {
                 onOptionClick={(metric) => setSelectedMetric(metric)}
               />
             </div>
-            <button onClick={handleAddItem}>Add Query</button>
+            {button &&<Button onClick={handleAddItem}>Add Query</Button>} 
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
 
           </div>
-          <div className='queries'>
+          <div className='created-queries'>
+            <h3>Your Queries</h3>
             {list.map((query, index) => (
               <div key={query.queryID}>
                 <p>
                   {index + 1}: {query.name}
                 </p>
-                <button onClick={() => handleSelectQuery(query)}>Edit</button>
-                <button onClick={() => handleEditQuery(query)}>
-                  Save Changes
-                </button>
-                <button
-                  className={`query ${selectedQuery === query ? 'selected' : ''}`}
+                {button &&<Button buttonStyle={'btn--outline'} onClick={handleSelectQuery} buttonSize={'btn--small'}>Edit</Button>}
+                {button &&<Button buttonStyle={'btn--outline'} onClick={handleEditQuery} buttonSize={'btn--small'}>Save Changes</Button>}
+                {button &&<Button  buttonStyle={'btn--outline'} className={`query ${selectedQuery === query ? 'selected' : ''}`}
                   onClick={() => {
                     setSelectedQuery(query);
-                  }}>Select Query</button>
+                  }} buttonSize={'btn--small'}>Select</Button>}
 
               </div>
             ))}
           </div>
           <div>
       {/* Other content */}
-      <Link className="trends-button" onClick={createTrend}>
-        <button>Create Trend!</button>
-      </Link>
+    
+     
     </div>
         </div>
         <div className="create-conditions">
           <h2>Create Conditions</h2>
+          <div className='sides'>
+          <div className='left'>
           <div className="input_name">
             <h3>Name: </h3>
             <input
@@ -314,6 +330,8 @@ function AnalysisPage({ data }) {
               }}
             />
           </div>
+          </div>
+          <div className='right'>
           <div className="input_qid">
             <h3>Query to aggregate:</h3>
             <input
@@ -342,19 +360,25 @@ function AnalysisPage({ data }) {
               onOptionClick={(agg_metric) => setSelected_agg_metric(agg_metric)}
             />
           </div>
+          </div>
+          </div>
           <Button onClick={handleAddCondition}>Add Condition</Button>
-
-        </div>
-
-      </div>
-      <div className="created-conditions">
-        <h2>Created Conditions</h2>
+          {errorCondition && <p style={{ color: 'red' }}>{errorCondition}</p>}
+          <div className="created-conditions">
+        <h3>Your Conditions</h3>
         <ol>
           {conditions.map((condition, index) => (
             <li key={index}>{condition.cname}</li>
           ))}
         </ol>
       </div>
+
+        </div>
+
+      </div>
+      {button &&<Button onClick={createTrend} to= '/TrendsPage'>Create Trend!</Button>}
+
+
     </>
   );
 };

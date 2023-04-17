@@ -18,18 +18,18 @@
     flex-direction: column;
     width: 450px;
     min-height: 500px; /* use min-height instead of height */
-    background-color: #1DB954;
+    background-color:  #f7f7f7;
     border-radius: 15px;
     padding: 15px;
-    margin: 20px;
+    margin: 10px;
   }
  .graphside{
     display: flex;
     flex-direction: column;
     width: 850px;
     height: 500px;
-    background-color: #1DB954;
+    background-color:  #f7f7f7;
     border-radius: 15px;
     padding: 15px;
-    margin: 20px
+    margin: 10px;
  }
