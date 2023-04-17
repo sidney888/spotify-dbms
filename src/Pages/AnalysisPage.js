@@ -4,6 +4,7 @@ import Button from '../Components/Button';
 import { query_metrics_track, query_metrics_album, aggregate_metrics_track, aggregate_metrics_album, condition_metrics_track, condition_metrics_album } from '../assets/metrics.js';
 import { Link, useNavigate } from 'react-router-dom';
 import './AnalysisPage.css';
+import logo from '../assets/spotify.png';
 
 class Query {
   static lastID = 0; //keeps track of queryIDs.
@@ -202,6 +203,15 @@ function AnalysisPage({ data }) {
 
   return (
     <>
+     <div className="profile">
+      <Link to="/TrendsPage">
+        <img src={logo} alt="Spotify Logo" className="logo" />
+        </Link>
+        <h1 className="welcome-message">
+        STAMP: Spotify Trend Analysis for Musical Professionals</h1>
+    </div>
+
+
       <h1>
         Input for Trend Analysis
       </h1>
@@ -255,6 +265,7 @@ function AnalysisPage({ data }) {
 
           </div>
           <div className='queries'>
+            <h3>Your Queries</h3>
             {list.map((query, index) => (
               <div key={query.queryID}>
                 <p>
@@ -279,8 +290,11 @@ function AnalysisPage({ data }) {
      
     </div>
         </div>
+        
         <div className="create-conditions">
           <h2>Create Conditions</h2>
+          <div className='sides'>
+          <div className='left'>
           <div className="input_name">
             <h3>Name: </h3>
             <input
@@ -322,6 +336,8 @@ function AnalysisPage({ data }) {
               }}
             />
           </div>
+          </div>
+          <div className='right'>
           <div className="input_qid">
             <h3>Query to aggregate:</h3>
             <input
@@ -350,21 +366,24 @@ function AnalysisPage({ data }) {
               onOptionClick={(agg_metric) => setSelected_agg_metric(agg_metric)}
             />
           </div>
+          </div>
+          </div>
           <Button onClick={handleAddCondition}>Add Condition</Button>
           {errorCondition && <p style={{ color: 'red' }}>{errorCondition}</p>}
-
-        </div>
-
-      </div>
-      {button &&<Button onClick={createTrend} to= '/TrendsPage'>Create Trend!</Button>}
-      <div className="created-conditions">
-        <h2>Created Conditions</h2>
+          <div className="created-conditions">
+        <h3>Your Conditions</h3>
         <ol>
           {conditions.map((condition, index) => (
             <li key={index}>{condition.cname}</li>
           ))}
         </ol>
       </div>
+
+        </div>
+
+      </div>
+      {button &&<Button onClick={createTrend} to= '/TrendsPage'>Create Trend!</Button>}
+
 
     </>
   );

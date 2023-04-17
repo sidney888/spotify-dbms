@@ -14,12 +14,31 @@
   display: flex;
   flex-wrap: wrap;
 }
-.create-queries,
-.create-conditions {
+.create-queries{
   width: 50%;
   background-color: #f7f7f7;
   border-radius: 20px;
-  padding: 20px;
+  margin: 10px;
+  padding-left: 30px;
+  padding-bottom: 20px;
+}
+.create-conditions{
+  width: 50%;
+  background-color: #f7f7f7;
+  border-radius: 20px;
+  margin: 10px;
+  padding-left: 30px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.sides{
+  display: flex;
+  flex-direction: row;
+  margin: 10px;
+}
+.right{
+  padding-left: 10px;
 }
 .created-conditions {
   display: flex;

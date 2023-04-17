@@ -6,10 +6,21 @@ import './TrendsPage.css';
 import { useLocation } from 'react-router-dom';
 import Graph from '../Components/Graph';
 import Table from '../Components/Table';
+import logo from '../assets/spotify.png';
+import { Link, useNavigate } from 'react-router-dom';
 
   const TrendsPage = () => {
     const data = useLocation().state;
     return (
+      <>
+       <div className="profile">
+      <Link to="/TrendsPage">
+        <img src={logo} alt="Spotify Logo" className="logo" />
+        </Link>
+        <h1 className="welcome-message">
+        STAMP: Spotify Trend Analysis for Musical Professionals</h1>
+        </div>
+      
               <div className="case">
                   <h1>Trend Analysis</h1>
               <p className = "getstarted">Here are the trends</p>
@@ -29,6 +40,8 @@ import Table from '../Components/Table';
               </div>
               {Button && <Button buttonStyle='btn--primary'to='/QueryUs'>New Trend</Button>}
               </div>
+
+              </>
         )
       }
       export default TrendsPage;
