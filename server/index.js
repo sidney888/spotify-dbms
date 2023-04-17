@@ -350,7 +350,7 @@ app.get("/api/analyze", (req, res) => {
 		query_table.add("Artist");
 		query_table.add(artist_relation);
 	}
-	res.json(
+	execute(
 		`SELECT ${monthly ? "Month," : ""} Year, ${count ? "COUNT(*)" : `AVG(QueryMetric)`}
 		FROM
 		(
@@ -364,14 +364,11 @@ app.get("/api/analyze", (req, res) => {
 		${suffix}
 		)
 		GROUP BY Year${monthly ? ", Month" : ""}`.replaceAll("\t", "").replaceAll(/\n\s*\n/g,"\n").replaceAll(/ \s* /g, " ")
-	);
-	/*execute(
-	 * beautiful query
 	).then(result => {
 		res.json(result.rows);
 	}).catch(err => {
 		res.json({"error": err});
-	});*/
+	});
 });
 
 app.listen(PORT, () => {

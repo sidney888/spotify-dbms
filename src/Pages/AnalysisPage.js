@@ -181,6 +181,17 @@ function AnalysisPage({ data }) {
     console.log('Currently selected query:', selectedQuery);
     console.log('Conditions: ', conditions);
   }, [selectedQuery, conditions]);
+
+  function createTrend() {
+	  const q = {queries: {}, analyze: selectedQuery.queryID};
+	  for (const query of list) {
+		  q.queries[query.queryID] = query;
+	  }
+	  fetch(`/api/analyze?q=${JSON.stringify(q)}`)
+	  	.then((res) => res.json())
+	  	.then((foobar) => console.log(foobar));
+  }
+
   return (
     <>
       <h1>
@@ -255,7 +266,7 @@ function AnalysisPage({ data }) {
           </div>
           <div>
       {/* Other content */}
-      <Link to="/TrendsPage" className="trends-button">
+      <Link to="/TrendsPage" className="trends-button" onClick={createTrend}>
         <button>Create Trend!</button>
       </Link>
     </div>
