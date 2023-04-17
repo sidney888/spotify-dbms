@@ -34,6 +34,7 @@ async function execute(query) {
 	try {
 		connection = await oracledb.getConnection(connAttrs);
 		const result = await connection.execute(query);
+
 		return result;
 	} catch(err) {
 		throw err;

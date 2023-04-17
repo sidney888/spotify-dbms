@@ -7,8 +7,9 @@ import { useLocation } from 'react-router-dom';
 import Graph from '../Components/Graph';
 import Table from '../Components/Table';
 
+
   const TrendsPage = () => {
-    const data = useLocation().state;
+    const data = useLocation().state; //pass this to graph and table to be displayed. 
     return (
               <div className="case">
                   <h1>Trend Analysis</h1>
@@ -19,12 +20,12 @@ import Table from '../Components/Table';
                 <h2>
                   Graph
                 </h2>
-               <Graph />
+               <Graph data={data}/> 
       
               </div>
               <div className= 'tableside'>
                 <h2>Table</h2>
-                <Table />
+                <Table data={data}/>
               </div>
               </div>
               {Button && <Button buttonStyle='btn--primary'to='/QueryUs'>New Trend</Button>}
