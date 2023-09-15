@@ -55,8 +55,6 @@ const Graph = ({data}) => {
     ],
   };
 
-	console.log(data.datasets[0].data);
-	console.log("HI");
 
   const canvasRef = useRef(null);
   const unit = year_only ? 'year' : 'month';
